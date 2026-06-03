@@ -1,23 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PlanFlow Pomodoro Widget</title>
+  <title>PlanFlow — Pomodoro Widget</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+  <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --primary:  #7B2FBE;
-      --secondary:#4361EE;
-      --accent:   #F77F00;
-      --fg:       rgba(235, 232, 255, 0.95);
-      --fg-muted: rgba(180, 170, 220, 0.7);
-      --border:   rgba(123, 47, 190, 0.35);
-      --muted-bg: rgba(255,255,255,0.06);
+      /* Dark mode colors from globals.css */
+      --background: #1f1f2e;
+      --foreground: #e8e8f0;
+      --muted: #38384a;
+      --muted-foreground: #a6a6b8;
+      --primary: #9d7ce8;
+      --secondary: #5a9fd4;
+      --accent: #fbbf24;
+      --border: #3f3f52;
+      --card: #282839;
     }
 
     html, body {
@@ -27,13 +31,15 @@
       overflow: hidden;
       user-select: none;
       -webkit-font-smoothing: antialiased;
-      font-family: 'Geist', system-ui, sans-serif;
-      color: var(--fg);
+      font-family: 'Geist', system-ui, -apple-system, sans-serif;
+      color: var(--foreground);
+      margin: 0;
+      padding: 0;
+      height: 100vh;
     }
 
-    /* ── Glass card ─────────────────────────────── */
     .card {
-      width: 300px;
+      width: 100%;
       height: 100%;
       background: rgba(15, 15, 26, 0.45);
       backdrop-filter: blur(20px);
@@ -47,508 +53,865 @@
       flex-direction: column;
     }
 
-    /* ── Compact view ────────────────────────────── */
+    /* ══════════════════════════════════════════════════
+       COMPACT MODE (Timer + Quote + Expand)
+       ══════════════════════════════════════════════════ */
+
     .compact-view {
-      padding: 12px 16px;
+      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      flex: 1;
+      padding: 20px;
+      gap: 16px;
       -webkit-app-region: drag;
     }
 
     .compact-timer {
-      font-size: 48px;
+      font-size: 64px;
       font-weight: 700;
       letter-spacing: -2px;
       font-variant-numeric: tabular-nums;
       line-height: 1;
-      flex-shrink: 0;
       text-align: center;
+      transition: color 0.3s ease;
     }
 
-    .compact-right {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
+    .compact-timer.work { color: #c39af0; }
+    .compact-timer.shortBreak { color: #7ec8f7; }
+    .compact-timer.longBreak { color: #fbb96b; }
 
     .compact-quote {
-      font-size: 11px;
-      color: var(--fg-muted);
-      line-height: 1.4;
+      font-size: 12px;
+      color: var(--muted-foreground);
+      line-height: 1.5;
       text-align: center;
+      font-style: italic;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
-      font-style: italic;
+      overflow: hidden;
+      max-width: 280px;
     }
 
     .compact-actions {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       align-items: center;
       justify-content: center;
       -webkit-app-region: no-drag;
     }
 
-    /* ── Full view ───────────────────────────────── */
-    .full-view { 
-      display: none; 
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .full-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 14px 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .session-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--fg);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .full-timer-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 18px 16px 12px;
-      gap: 6px;
-    }
-
-    .full-timer {
-      font-size: 54px;
-      font-weight: 700;
-      letter-spacing: -2px;
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-    }
-
-    .session-counter {
-      font-size: 11px;
-      color: var(--fg-muted);
-    }
-
-    /* progress bar */
-    .prog-wrap {
-      padding: 0 16px;
-      margin-bottom: 12px;
-    }
-    .prog-track {
-      height: 3px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .prog-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width 0.5s linear;
-      background: var(--primary);
-    }
-
-    /* controls */
-    .controls {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      padding: 0 16px 14px;
-      -webkit-app-region: no-drag;
-    }
-
-    /* quote full */
-    .quote-wrap {
-      margin: 0 14px 12px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 10px;
-      padding: 10px 12px;
-      animation: fadeUp 0.4s ease;
-    }
-    .quote-wrap[dir="rtl"] {
-      font-family: 'Noto Naskh Arabic', system-ui, sans-serif;
-      text-align: right;
-    }
-    .q-text  { font-size: 11px; font-style: italic; line-height: 1.5; color: var(--fg); margin-bottom: 4px; }
-    .q-author{ font-size: 10px; color: var(--fg-muted); }
-
-    /* lang toggle */
-    .lang-row {
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-      padding: 0 16px 14px;
-      -webkit-app-region: no-drag;
-    }
-
-    /* ── Shared button styles ────────────────────── */
     .icon-btn {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--fg-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted-foreground);
       cursor: pointer;
-      width: 26px; height: 26px;
-      border-radius: 7px;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.15s;
-      flex-shrink: 0;
+      transition: all 0.2s ease;
       -webkit-app-region: no-drag;
     }
-    .icon-btn:hover { color: var(--fg); background: rgba(255,255,255,0.13); }
 
-    .ctrl-btn {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--fg-muted);
-      cursor: pointer;
-      width: 38px; height: 38px;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.15s;
+    .icon-btn:hover {
+      color: var(--foreground);
+      background: rgba(255,255,255,0.12);
     }
-    .ctrl-btn:hover { color: var(--fg); background: rgba(255,255,255,0.13); }
-    .ctrl-btn.play {
-      width: 46px; height: 46px; border-radius: 12px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border: none; color: #fff;
-    }
-    .ctrl-btn.play:hover { opacity: 0.88; transform: scale(1.04); }
 
-    .lang-btn {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--fg-muted);
-      cursor: pointer;
-      padding: 4px 10px;
-      border-radius: 7px;
-      font-size: 10px; font-weight: 500;
-      display: flex; align-items: center; gap: 4px;
-      transition: all 0.15s;
+    .icon-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
     }
-    .lang-btn.active {
-      background: rgba(123,47,190,0.25);
-      border-color: var(--primary);
+
+    /* ══════════════════════════════════════════════════
+       FULL MODE (Complete Pomodoro Interface)
+       ══════════════════════════════════════════════════ */
+
+    .full-view {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      padding: 24px;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .full-view.active {
+      display: flex;
+    }
+
+    /* Header with Mode Tabs */
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mode-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      background: transparent;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-app-region: no-drag;
+    }
+
+    .mode-tab:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .mode-tab.active {
+      background: rgba(139, 92, 246, 0.15);
       color: #c39af0;
     }
 
-    /* color variants */
-    .work      { color: #c39af0; }
-    .shortBreak{ color: #7ec8f7; }
-    .longBreak { color: #fbb96b; }
-    .prog-short{ background: var(--secondary); }
-    .prog-long { background: var(--accent); }
-
-    svg { width: 14px; height: 14px; stroke: currentColor; fill: none;
-          stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    svg.fill { fill: currentColor; stroke: none; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(5px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .mode-tab.active.secondary {
+      background: rgba(59, 130, 246, 0.15);
+      color: #7ec8f7;
     }
+
+    .mode-tab.active.accent {
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbb96b;
+    }
+
+    .mode-tab svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* Quote Section */
+    .quote-section {
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .quote-section.visible {
+      display: block;
+    }
+
+    .quote-label {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .quote-label svg {
+      width: 14px;
+      height: 14px;
+      fill: #c39af0;
+    }
+
+    .quote-text {
+      font-size: 15px;
+      font-style: italic;
+      color: var(--foreground);
+      line-height: 1.6;
+      margin-bottom: 6px;
+    }
+
+    .quote-author {
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+
+    /* Timer Display with SVG Ring */
+    .timer-display {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px 0;
+    }
+
+    .timer-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .timer-ring svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.15));
+    }
+
+    .timer-bg-ring {
+      fill: none;
+      stroke: rgba(139, 92, 246, 0.1);
+      stroke-width: 2;
+    }
+
+    .timer-progress-ring {
+      fill: none;
+      stroke: #c39af0;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-dasharray: 282;
+      stroke-dashoffset: 282;
+      transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
+      transform-origin: 50% 50%;
+      transform: rotate(-90deg);
+    }
+
+    .timer-progress-ring.secondary { stroke: #7ec8f7; }
+    .timer-progress-ring.accent { stroke: #fbb96b; }
+
+    .timer-text {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .timer-time {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      color: #c39af0;
+      transition: color 0.3s ease;
+    }
+
+    .timer-time.secondary { color: #7ec8f7; }
+    .timer-time.accent { color: #fbb96b; }
+
+    .timer-session {
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .control-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted-foreground);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-app-region: no-drag;
+    }
+
+    .control-btn:hover {
+      background: rgba(255,255,255,0.12);
+      color: var(--foreground);
+    }
+
+    .control-btn.play-btn {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      color: white;
+    }
+
+    .control-btn.play-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+    }
+
+    .control-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .control-btn.play-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Stats */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 16px 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 0;
+    }
+
+    .notification-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      -webkit-app-region: no-drag;
+    }
+
+    .notification-btn:hover {
+      color: var(--foreground);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .notification-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .lang-divider {
+      width: 1px;
+      height: 16px;
+      background: rgba(255,255,255,0.15);
+    }
+
+    .lang-toggle {
+      display: flex;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .lang-toggle button {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      -webkit-app-region: no-drag;
+    }
+
+    .lang-toggle button.active {
+      background: rgba(139, 92, 246, 0.2);
+      color: #c39af0;
+    }
+
+    .lang-toggle button:not(.active):hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.3);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(139, 92, 246, 0.5);
+    }
+  </style>
   </style>
 </head>
 <body>
-<div class="card" id="card">
-
-  <!-- ═══ COMPACT VIEW ═══ -->
+<div class="card">
+  <!-- COMPACT VIEW: Timer + Quote + Expand Button -->
   <div class="compact-view" id="compactView">
     <div class="compact-timer work" id="cTimer">25:00</div>
-    <div class="compact-right">
-      <div class="compact-quote" id="cQuote">"The secret of getting ahead is getting started."</div>
-      <div class="compact-actions">
-        <button class="icon-btn" id="expandBtn" title="Expand">
-          <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-        </button>
-      </div>
+    <div class="compact-quote" id="cQuote">"The secret of getting ahead is getting started."</div>
+    <div class="compact-actions">
+      <button class="icon-btn" id="expandBtn" title="Expand">
+        <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+      </button>
     </div>
   </div>
 
-  <!-- ═══ FULL VIEW ═══ -->
+  <!-- FULL VIEW: Complete Pomodoro Interface -->
   <div class="full-view" id="fullView">
-    <div class="full-header">
-      <div class="session-label">
-        <span id="fIcon">🧠</span>
-        <span id="fLabel">Focus</span>
+    <!-- Mode Tabs -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="modeWork" data-mode="work">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle></svg>
+        Focus
+      </button>
+      <button class="mode-tab" id="modeShortBreak" data-mode="shortBreak">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path></svg>
+        Short Break
+      </button>
+      <button class="mode-tab" id="modeLongBreak" data-mode="longBreak">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path></svg>
+        Long Break
+      </button>
+      <button class="icon-btn" style="margin-left: auto; width: 32px; height: 32px;" id="collapseBtn" title="Collapse">
+        <svg viewBox="0 0 24 24"><polyline points="9 3 3 3 3 9"></polyline><polyline points="21 21 21 15 15 15"></polyline><line x1="3" y1="21" x2="10" y2="14"></line><line x1="21" y1="3" x2="14" y2="10"></line></svg>
+      </button>
+    </div>
+
+    <!-- Quote (Work Mode Only) -->
+    <div class="quote-section" id="quoteSection">
+      <div class="quote-label">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-4.716-5-7-5-2.232 0-5 1.757-5 5 0 2 1.238 4.5 3 5.5 1.5 0 2 1 2 2s-.5 2-2 2"></path><path d="M15 21c3 0 7-1 7-8V5c0-1.25-4.716-5-7-5-2.232 0-5 1.757-5 5 0 2 1.238 4.5 3 5.5 1.5 0 2 1 2 2s-.5 2-2 2"></path></svg>
+        Focus Quote
       </div>
-      <div style="display:flex;gap:6px;-webkit-app-region:no-drag">
-        <button class="icon-btn" id="collapseBtn" title="Compact">
-          <svg viewBox="0 0 24 24"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/></svg>
-        </button>
-        <button class="icon-btn" id="fClose" title="Close">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+      <div class="quote-text" id="fQuoteText">"The secret of getting ahead is getting started."</div>
+      <div class="quote-author" id="fQuoteAuthor">— Napoleon Hill</div>
+    </div>
+
+    <!-- Timer Display -->
+    <div class="timer-display">
+      <div class="timer-ring">
+        <svg viewBox="0 0 100 100">
+          <circle class="timer-bg-ring" cx="50" cy="50" r="45"></circle>
+          <circle class="timer-progress-ring work" cx="50" cy="50" r="45" id="timerRing"></circle>
+        </svg>
+      </div>
+      <div class="timer-text">
+        <div class="timer-time work" id="fTimer">25:00</div>
+        <div class="timer-session" id="fSession">Session 1 of 4</div>
       </div>
     </div>
 
-    <div class="full-timer-wrap">
-      <div class="full-timer work" id="fTimer">25:00</div>
-      <div class="session-counter">Session <span id="fSessNum">1</span> of <span id="fSessTotal">4</span></div>
-    </div>
-
-    <div class="prog-wrap">
-      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-    </div>
-
+    <!-- Controls -->
     <div class="controls">
-      <button class="ctrl-btn" id="fReset" title="Reset">
-        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      <button class="control-btn" id="fReset" title="Reset">
+        <svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"></path><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
       </button>
-      <button class="ctrl-btn play" id="fPlay">
-        <svg class="fill" viewBox="0 0 24 24" style="width:18px;height:18px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <button class="control-btn play-btn" id="fPlay" title="Play/Pause">
+        <svg viewBox="0 0 24 24" class="play-icon"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <svg viewBox="0 0 24 24" class="pause-icon" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
       </button>
     </div>
 
-    <div class="quote-wrap" id="fQuoteWrap" dir="ltr">
-      <p class="q-text"   id="fQuoteText">"The secret of getting ahead is getting started."</p>
-      <p class="q-author" id="fQuoteAuthor">— Mark Twain</p>
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-value" id="pomosCompleted">0</div>
+        <div class="stat-label">Pomodoros</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="minutesFocused">0</div>
+        <div class="stat-label">Minutes</div>
+      </div>
     </div>
 
-    <div class="lang-row">
-      <button class="lang-btn active" id="langEn">🇬🇧 EN</button>
-      <button class="lang-btn"        id="langAr">🇪🇬 AR</button>
+    <!-- Footer -->
+    <div class="footer">
+      <button class="notification-btn" id="notifBtn" title="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span>Notifications</span>
+      </button>
+      <div class="lang-divider"></div>
+      <div class="lang-toggle">
+        <button class="active" id="langEn">EN</button>
+        <button id="langAr">AR</button>
+      </div>
     </div>
   </div>
-
 </div>
 <script>
-// ── Quotes ────────────────────────────────────────────────────────────
-const Q_EN = [
-  { text:'The secret of getting ahead is getting started.', author:'Mark Twain' },
-  { text:'Success is not final, failure is not fatal.', author:'Winston Churchill' },
-  { text:"Don't watch the clock; do what it does. Keep going.", author:'Sam Levenson' },
-  { text:'The future depends on what you do today.', author:'Mahatma Gandhi' },
-  { text:'Focus on being productive instead of busy.', author:'Tim Ferriss' },
-  { text:'The expert in anything was once a beginner.', author:'Helen Hayes' },
-  { text:'Do something today that your future self will thank you for.', author:'Sean Flanery' },
-  { text:'Believe you can and you\'re halfway there.', author:'Theodore Roosevelt' },
-  { text:'Excellence is not a destination; it is a continuous journey.', author:'Brian Tracy' },
-  { text:'You are what you do, not what you say you\'ll do.', author:'C.G. Jung' },
-  { text:'Learning is not attained by chance; it must be sought with ardor.', author:'Abigail Adams' },
-  { text:'An investment in knowledge pays the best interest.', author:'Benjamin Franklin' },
-  { text:'The mind is not a vessel to be filled, but a fire to be kindled.', author:'Plutarch' },
-  { text:'Education is the passport to the future.', author:'Malcolm X' },
-  { text:'Start where you are. Use what you have. Do what you can.', author:'Arthur Ashe' },
-];
+  // ────────────────────────────────────────────────────────────────
+  // QUOTES DATABASE
+  // ────────────────────────────────────────────────────────────────
 
-const Q_AR = [
-  { text:'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ الْعُسْرِ يُسْرًا', author:'القرآن الكريم — سورة الانشراح' },
-  { text:'وَقُل رَّبِّ زِدْنِي عِلْمًا', author:'القرآن الكريم — سورة طه' },
-  { text:'يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ', author:'القرآن الكريم — سورة المجادلة' },
-  { text:'مَن سَلَكَ طَريقًا يَلتَمِسُ فيهِ عِلمًا سَهَّلَ اللَّهُ لَهُ طَريقًا إلى الجَنَّةِ', author:'صحيح مسلم' },
-  { text:'اطلُبوا العِلمَ مِنَ المَهدِ إلى اللَّحد', author:'حكمة إسلامية' },
-  { text:'مَن جَدَّ وَجَد، وَمَن زَرَعَ حَصَد', author:'حكمة عربية' },
-  { text:'العِلمُ نُورٌ وَالجَهلُ ظَلامٌ', author:'حكمة عربية' },
-  { text:'على قَدرِ أهلِ العَزمِ تَأتي العَزائِم\nوتَأتي على قَدرِ الكِرامِ المَكارِم', author:'المتنبي' },
-  { text:'وَإِذا كانَت النُّفوسُ كِباراً\nتَعِبَت في مُرادِها الأَجسامُ', author:'المتنبي' },
-  { text:'أنا مَن نَظَرَ الأَعمى إِلى أَدَبي\nوَأَسمَعَت كَلِماتي مَن بِهِ صَمَم', author:'المتنبي' },
-  { text:'اِصبِر على مَضَضِ الإِدلاجِ في السَّحَرِ\nوَما اِفتِقارُكَ إِلّا فَقرُ مَن قَدَرا', author:'أحمد شوقي' },
-  { text:'سَلامٌ مِن صَبا بَردى أَرَقُّ\nوَدَمعٌ لا يُكَفكَفُ يا دِمَشق', author:'أحمد شوقي' },
-  { text:'الصَّبرُ مِفتاحُ الفَرَج', author:'ابن القيم الجوزية' },
-  { text:'شَغَلتُ قَلبي بِالعِلمِ فَفاضَ\nوَكُنتُ قَبلَ ذلِكَ كَالمَيِّت', author:'ابن القيم الجوزية' },
-  { text:'الوَقتُ كَالسَّيف إِن لَم تَقطَعهُ قَطَعَك', author:'حكمة عربية' },
-  { text:'لا تَحقِرَنَّ صَغيرةً إِنَّ الجِبالَ مِن الحَصى', author:'حكمة عربية' },
-  { text:'النَّجاحُ لَيسَ نِهايةً، والفَشَلُ لَيسَ قاتِلاً، الشَّجاعَةُ هِيَ ما يُهِمّ', author:'حكمة عربية' },
-];
+  const QUOTES = {
+    en: [
+      { text: "The secret of getting ahead is getting started.", author: "Napoleon Hill" },
+      { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+      { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+      { text: "Focus is the gateway to success.", author: "Brian Tracy" },
+      { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
+      { text: "Success is not final, failure is not fatal.", author: "Winston Churchill" },
+      { text: "The future depends on what you do today.", author: "Mahatma Gandhi" },
+      { text: "Excellence is not a destination; it is a continuous journey.", author: "Brian Tracy" },
+      { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
+    ],
+    ar: [
+      { text: "سر التقدم هو البدء.", author: "نابليون هيل" },
+      { text: "لا تراقب الساعة؛ افعل ما تفعله. استمر.", author: "سام ليفنسون" },
+      { text: "التركيز هو بوابة النجاح.", author: "برايان تريسي" },
+      { text: "العِلمُ نُورٌ وَالجَهلُ ظَلامٌ", author: "حكمة عربية" },
+      { text: "الصَّبرُ مِفتاحُ الفَرَج", author: "ابن القيم الجوزية" },
+    ],
+  };
 
-// ── State ─────────────────────────────────────────────────────────────
-let isFullMode  = false;
-let isRunning   = false;
-let sessionType = 'work';
-let sessionCount= 0;
-let totalSess   = 4;
-let language    = localStorage.getItem('planflow-widget-language') || 'en';
-let durations   = { work: 25*60, shortBreak: 5*60, longBreak: 15*60 };
-let currentTime = durations.work;
-let interval    = null;
-let currentQuote= Q_EN[0];
+  // ────────────────────────────────────────────────────────────────
+  // STATE
+  // ────────────────────────────────────────────────────────────────
 
-// ── Helpers ───────────────────────────────────────────────────────────
-const fmt = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+  let isCompactMode = true;
+  let isRunning = false;
+  let currentMode = 'work';
+  let language = localStorage.getItem('planflow-widget-language') || 'en';
+  let notificationsEnabled = false;
 
-function randomQuote() {
-  const pool = language === 'ar' ? Q_AR : Q_EN;
-  return pool[Math.floor(Math.random() * pool.length)];
-}
+  let timerState = {
+    mode: 'work',
+    timeRemaining: 25 * 60,
+    sessionCount: 0,
+    totalSessions: 4,
+    isRunning: false,
+  };
 
-function modeClass() {
-  return sessionType === 'work' ? 'work' : sessionType === 'shortBreak' ? 'shortBreak' : 'longBreak';
-}
+  let settings = {
+    workDuration: 25,
+    shortBreakDuration: 5,
+    longBreakDuration: 15,
+    sessionsBeforeLongBreak: 4,
+  };
 
-// ── Render ────────────────────────────────────────────────────────────
-function render() {
-  const mc = modeClass();
-  const timeStr = fmt(currentTime);
-  const dur = durations[sessionType];
-  const pct = ((dur - currentTime) / dur * 100).toFixed(1);
+  let currentQuote = QUOTES[language][Math.floor(Math.random() * QUOTES[language].length)];
+  let timerInterval = null;
 
-  // compact
-  cTimer.textContent = timeStr;
-  cTimer.className = `compact-timer ${mc}`;
+  // ────────────────────────────────────────────────────────────────
+  // DOM REFERENCES
+  // ────────────────────────────────────────────────────────────────
 
-  // compact quote (no quotes/author in compact, just text snippet)
-  cQuote.textContent = `"${currentQuote.text.slice(0,80)}${currentQuote.text.length>80?'…':''}"`;
-  if (language === 'ar') {
-    cQuote.style.direction = 'rtl';
-    cQuote.style.fontFamily = "'Noto Naskh Arabic', system-ui, sans-serif";
-  } else {
-    cQuote.style.direction = 'ltr';
-    cQuote.style.fontFamily = "'Geist', system-ui, sans-serif";
-  }
+  const compactView = document.getElementById('compactView');
+  const fullView = document.getElementById('fullView');
+  const cTimer = document.getElementById('cTimer');
+  const cQuote = document.getElementById('cQuote');
+  const expandBtn = document.getElementById('expandBtn');
+  const collapseBtn = document.getElementById('collapseBtn');
+  const fTimer = document.getElementById('fTimer');
+  const fSession = document.getElementById('fSession');
+  const fPlay = document.getElementById('fPlay');
+  const fReset = document.getElementById('fReset');
+  const fQuoteText = document.getElementById('fQuoteText');
+  const fQuoteAuthor = document.getElementById('fQuoteAuthor');
+  const quoteSection = document.getElementById('quoteSection');
+  const notifBtn = document.getElementById('notifBtn');
+  const langEn = document.getElementById('langEn');
+  const langAr = document.getElementById('langAr');
+  const modeWork = document.getElementById('modeWork');
+  const modeShortBreak = document.getElementById('modeShortBreak');
+  const modeLongBreak = document.getElementById('modeLongBreak');
+  const timerRing = document.getElementById('timerRing');
+  const pomosCompleted = document.getElementById('pomosCompleted');
+  const minutesFocused = document.getElementById('minutesFocused');
 
-  // full
-  fTimer.textContent = timeStr;
-  fTimer.className = `full-timer ${mc}`;
-  fSessNum.textContent   = sessionCount + 1;
-  fSessTotal.textContent = totalSess;
-  progFill.style.width   = pct + '%';
-  progFill.className = `prog-fill${sessionType==='shortBreak' ? ' prog-short' : sessionType==='longBreak' ? ' prog-long' : ''}`;
+  // ────────────────────────────────────────────────────────────────
+  // TIMER LOGIC
+  // ────────────────────────────────────────────────────────────────
 
-  const icons = { work:'🧠', shortBreak:'☕', longBreak:'🌙' };
-  const labels = { work:'Focus', shortBreak:'Short Break', longBreak:'Long Break' };
-  fIcon.textContent  = icons[sessionType];
-  fLabel.textContent = labels[sessionType];
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
-  fPlay.innerHTML = isRunning
-    ? '<svg viewBox="0 0 24 24" style="width:18px;height:18px"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'
-    : '<svg class="fill" viewBox="0 0 24 24" style="width:18px;height:18px"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+  const getTotalDuration = (mode) => {
+    if (mode === 'work') return settings.workDuration * 60;
+    if (mode === 'shortBreak') return settings.shortBreakDuration * 60;
+    return settings.longBreakDuration * 60;
+  };
 
-  // full quote
-  fQuoteText.textContent   = `"${currentQuote.text}"`;
-  fQuoteAuthor.textContent = `— ${currentQuote.author}`;
-  if (language === 'ar') {
-    fQuoteWrap.setAttribute('dir','rtl');
-    fQuoteWrap.style.fontFamily = "'Noto Naskh Arabic', system-ui, sans-serif";
-  } else {
-    fQuoteWrap.setAttribute('dir','ltr');
-    fQuoteWrap.style.fontFamily = "'Geist', system-ui, sans-serif";
-  }
+  const getProgress = () => {
+    const total = getTotalDuration(timerState.mode);
+    return ((total - timerState.timeRemaining) / total) * 100;
+  };
 
-  langEn.className = `lang-btn${language === 'en' ? ' active' : ''}`;
-  langAr.className = `lang-btn${language === 'ar' ? ' active' : ''}`;
-}
+  const updateTimerRing = () => {
+    const progress = getProgress();
+    const circumference = 2 * Math.PI * 45;
+    const offset = circumference * (1 - progress / 100);
+    timerRing.style.strokeDashoffset = offset;
+  };
 
-// ── Mode toggle ───────────────────────────────────────────────────────
-function setMode(full) {
-  isFullMode = full;
-  compactView.style.display = full ? 'none'  : 'flex';
-  fullView.style.display    = full ? 'flex'  : 'none';
-  if (window.electron) window.electron.setWidgetMode(full ? 'full' : 'compact');
-  render();
-}
-
-// ── Timer logic ───────────────────────────────────────────────────────
-function tick() {
-  if (currentTime > 0) {
-    currentTime--;
-    saveState();
-    render();
-  } else {
-    clearInterval(interval); interval = null; isRunning = false;
-    if (window.electron) {
-      const title = sessionType === 'work' ? '⏱️ Session done!' : '✨ Break over!';
-      const body  = sessionType === 'work' ? 'Time for a break!' : 'Back to work!';
-      window.electron.notify(title, body);
+  const updateProgress = () => {
+    if (timerState.isRunning && timerState.timeRemaining > 0) {
+      timerState.timeRemaining--;
+      if (timerState.timeRemaining === 0) {
+        timerState.isRunning = false;
+        nextSession();
+      }
     }
-    if (sessionType === 'work') {
-      sessionCount++;
-      sessionType = sessionCount % totalSess === 0 ? 'longBreak' : 'shortBreak';
+  };
+
+  const setMode = (mode) => {
+    timerState.mode = mode;
+    currentMode = mode;
+    const duration = getTotalDuration(mode);
+    timerState.timeRemaining = duration;
+
+    // Update mode tabs
+    document.querySelectorAll('.mode-tab').forEach(tab => {
+      tab.classList.remove('active', 'secondary', 'accent');
+      if (tab.getAttribute('data-mode') === mode) {
+        tab.classList.add('active');
+        if (mode === 'shortBreak') {
+          tab.classList.add('secondary');
+        } else if (mode === 'longBreak') {
+          tab.classList.add('accent');
+        }
+      }
+    });
+
+    updateColors();
+    render();
+  };
+
+  const updateColors = () => {
+    const colorMap = {
+      work: 'work',
+      shortBreak: 'secondary',
+      longBreak: 'accent',
+    };
+    const colorClass = colorMap[currentMode];
+
+    cTimer.className = `compact-timer ${currentMode}`;
+    fTimer.className = `timer-time ${colorClass}`;
+    timerRing.className = `timer-progress-ring ${colorClass}`;
+  };
+
+  const nextSession = () => {
+    if (currentMode === 'work') {
+      timerState.sessionCount++;
+      if (timerState.sessionCount % settings.sessionsBeforeLongBreak === 0) {
+        setMode('longBreak');
+      } else {
+        setMode('shortBreak');
+      }
     } else {
-      sessionType = 'work';
+      setMode('work');
     }
-    currentTime  = durations[sessionType];
-    currentQuote = randomQuote();
-    saveState(); render();
-  }
-}
+  };
 
-function togglePlay() {
-  if (isRunning) {
-    clearInterval(interval); interval = null; isRunning = false;
-  } else {
+  const startTimer = () => {
+    timerState.isRunning = true;
     isRunning = true;
-    interval  = setInterval(tick, 1000);
-  }
-  saveState(); render();
-}
-
-function resetTimer() {
-  clearInterval(interval); interval = null;
-  isRunning = false; sessionType = 'work'; sessionCount = 0;
-  currentTime  = durations.work;
-  currentQuote = randomQuote();
-  saveState(); render();
-}
-
-function saveState() {
-  localStorage.setItem('pomodoroState', JSON.stringify({
-    timeLeft: currentTime, sessionType, isRunning, sessionCount
-  }));
-}
-
-// Sync from main app every second
-setInterval(() => {
-  try {
-    const s = JSON.parse(localStorage.getItem('pomodoroState') || '{}');
-    if (s.timeLeft     !== undefined) currentTime  = s.timeLeft;
-    if (s.sessionType  !== undefined) sessionType  = s.sessionType;
-    if (s.sessionCount !== undefined) sessionCount = s.sessionCount;
-    if (s.isRunning    !== undefined && s.isRunning !== isRunning) {
-      isRunning = s.isRunning;
-      if (isRunning && !interval) interval = setInterval(tick, 1000);
-      if (!isRunning && interval) { clearInterval(interval); interval = null; }
-    }
     render();
-  } catch(e){}
-}, 1000);
+  };
 
-// ── DOM refs ──────────────────────────────────────────────────────────
-const compactView = document.getElementById('compactView');
-const fullView    = document.getElementById('fullView');
-const cTimer      = document.getElementById('cTimer');
-const cQuote      = document.getElementById('cQuote');
-const expandBtn   = document.getElementById('expandBtn');
-const collapseBtn = document.getElementById('collapseBtn');
-const fClose      = document.getElementById('fClose');
-const fTimer      = document.getElementById('fTimer');
-const fSessNum    = document.getElementById('fSessNum');
-const fSessTotal  = document.getElementById('fSessTotal');
-const progFill    = document.getElementById('progFill');
-const fPlay       = document.getElementById('fPlay');
-const fReset      = document.getElementById('fReset');
-const fIcon       = document.getElementById('fIcon');
-const fLabel      = document.getElementById('fLabel');
-const fQuoteWrap  = document.getElementById('fQuoteWrap');
-const fQuoteText  = document.getElementById('fQuoteText');
-const fQuoteAuthor= document.getElementById('fQuoteAuthor');
-const langEn      = document.getElementById('langEn');
-const langAr      = document.getElementById('langAr');
+  const pauseTimer = () => {
+    timerState.isRunning = false;
+    isRunning = false;
+    render();
+  };
 
-// ── Events ────────────────────────────────────────────────────────────
-expandBtn  .addEventListener('click', () => setMode(true));
-collapseBtn.addEventListener('click', () => setMode(false));
-fPlay      .addEventListener('click', togglePlay);
-fReset     .addEventListener('click', resetTimer);
-fClose     .addEventListener('click', () => { if(window.electron) window.electron.closeWidget(); });
-langEn     .addEventListener('click', () => { language='en'; localStorage.setItem('planflow-widget-language','en'); currentQuote=randomQuote(); render(); });
-langAr     .addEventListener('click', () => { language='ar'; localStorage.setItem('planflow-widget-language','ar'); currentQuote=randomQuote(); render(); });
+  const resetTimer = () => {
+    timerState.isRunning = false;
+    timerState.timeRemaining = getTotalDuration(timerState.mode);
+    isRunning = false;
+    render();
+  };
 
-// ── Init ──────────────────────────────────────────────────────────────
-currentQuote = randomQuote();
-setMode(false);
-render();
+  const togglePlay = () => {
+    if (timerState.isRunning) {
+      pauseTimer();
+    } else {
+      startTimer();
+    }
+  };
+
+  // ────────────────────────────────────────────────────────────────
+  // RENDERING
+  // ────────────────────────────────────────────────────────────────
+
+  const render = () => {
+    const timeStr = formatTime(timerState.timeRemaining);
+
+    // Update timers
+    cTimer.textContent = timeStr;
+    fTimer.textContent = timeStr;
+
+    // Update session display
+    fSession.textContent = `Session ${timerState.sessionCount + 1} of ${timerState.totalSessions}`;
+
+    // Update play button
+    const playIcon = fPlay.querySelector('.play-icon');
+    const pauseIcon = fPlay.querySelector('.pause-icon');
+    if (timerState.isRunning) {
+      playIcon.style.display = 'none';
+      pauseIcon.style.display = 'block';
+    } else {
+      playIcon.style.display = 'block';
+      pauseIcon.style.display = 'none';
+    }
+
+    // Update quote
+    cQuote.textContent = `"${currentQuote.text}"`;
+    fQuoteText.textContent = `"${currentQuote.text}"`;
+    fQuoteAuthor.textContent = `— ${currentQuote.author}`;
+
+    // Show/hide quote in full mode (only in work mode)
+    quoteSection.classList.toggle('visible', currentMode === 'work');
+
+    // Update timer ring
+    updateTimerRing();
+  };
+
+  // ────────────────────────────────────────────────────────────────
+  // MODE SWITCHING
+  // ────────────────────────────────────────────────────────────────
+
+  const setCompactMode = () => {
+    isCompactMode = true;
+    compactView.style.display = 'flex';
+    fullView.classList.remove('active');
+    if (window.electron) {
+      window.electron.widgetSetMode('compact');
+    }
+  };
+
+  const setFullMode = () => {
+    isCompactMode = false;
+    compactView.style.display = 'none';
+    fullView.classList.add('active');
+    if (window.electron) {
+      window.electron.widgetSetMode('full');
+    }
+  };
+
+  // ────────────────────────────────────────────────────────────────
+  // EVENTS
+  // ────────────────────────────────────────────────────────────────
+
+  expandBtn.addEventListener('click', setFullMode);
+  collapseBtn.addEventListener('click', setCompactMode);
+  fPlay.addEventListener('click', togglePlay);
+  fReset.addEventListener('click', resetTimer);
+
+  modeWork.addEventListener('click', () => setMode('work'));
+  modeShortBreak.addEventListener('click', () => setMode('shortBreak'));
+  modeLongBreak.addEventListener('click', () => setMode('longBreak'));
+
+  notifBtn.addEventListener('click', async () => {
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        notificationsEnabled = !notificationsEnabled;
+      } else {
+        const permission = await Notification.requestPermission();
+        notificationsEnabled = permission === 'granted';
+      }
+      render();
+    }
+  });
+
+  langEn.addEventListener('click', () => {
+    language = 'en';
+    langEn.classList.add('active');
+    langAr.classList.remove('active');
+    localStorage.setItem('planflow-widget-language', 'en');
+    currentQuote = QUOTES.en[Math.floor(Math.random() * QUOTES.en.length)];
+    render();
+  });
+
+  langAr.addEventListener('click', () => {
+    language = 'ar';
+    langAr.classList.add('active');
+    langEn.classList.remove('active');
+    localStorage.setItem('planflow-widget-language', 'ar');
+    currentQuote = QUOTES.ar[Math.floor(Math.random() * QUOTES.ar.length)];
+    render();
+  });
+
+  // Set initial language
+  if (language === 'ar') {
+    langAr.classList.add('active');
+    langEn.classList.remove('active');
+  }
+
+  // ────────────────────────────────────────────────────────────────
+  // TIMER INTERVAL
+  // ────────────────────────────────────────────────────────────────
+
+  setInterval(() => {
+    updateProgress();
+    render();
+  }, 1000);
+
+  // ────────────────────────────────────────────────────────────────
+  // INITIALIZATION
+  // ────────────────────────────────────────────────────────────────
+
+  updateColors();
+  render();
 </script>
 </body>
 </html>
