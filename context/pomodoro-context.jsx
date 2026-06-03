@@ -6,6 +6,13 @@ import { getRandomQuote } from '@/lib/quotes'
 
 const PomodoroContext = createContext(undefined)
 
+// Utility to broadcast state to widget
+const broadcastToWidget = (state) => {
+  if (window.electronAPI?.ipcSend) {
+    window.electronAPI.ipcSend('pomodoro-state-update', state)
+  }
+}
+
 export function PomodoroProvider({ children }) {
   const [settings, setSettings] = useState({
     workDuration: 25,
@@ -39,6 +46,11 @@ export function PomodoroProvider({ children }) {
       totalSessions: saved.sessionsBeforeLongBreak,
     }))
   }, [])
+
+  // Broadcast timer state to widget
+  useEffect(() => {
+    broadcastToWidget(timerState)
+  }, [timerState])
 
   // Timer logic
   useEffect(() => {

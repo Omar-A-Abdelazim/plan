@@ -19,6 +19,7 @@ import {
   Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { WidgetSettings } from '@/components/widget-settings'
 
 const PRIORITY_STYLES = {
   high: 'bg-destructive/20 text-destructive',
@@ -438,6 +439,9 @@ export function Pomodoro() {
           </div>
         </div>
       )}
+
+      {/* Widget Settings */}
+      <WidgetSettings />
     </div>
   )
 }

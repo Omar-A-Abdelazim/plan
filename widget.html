@@ -46,6 +46,9 @@
       padding: clamp(14px, 3%, 20px);
       gap: clamp(14px, 3%, 20px);
       height: 100%;
+      -webkit-app-region: drag;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -99,26 +102,42 @@
     .controls {
       display: flex;
       justify-content: center;
-      gap: clamp(6px, 1.5%, 10px);
+      gap: clamp(8px, 2%, 12px);
       flex-wrap: wrap;
       flex-shrink: 0;
+      -webkit-app-region: no-drag;
     }
 
     .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: clamp(6px, 1.2%, 8px) clamp(10px, 1.8%, 14px);
-      border: none;
-      border-radius: 6px;
-      background: var(--bg-secondary);
+      padding: clamp(6px, 1.2%, 8px) clamp(12px, 2.5%, 18px);
+      background: transparent;
+      border: 1px solid var(--border);
       color: var(--fg-muted);
+      border-radius: 6px;
       cursor: pointer;
-      font-size: clamp(11px, 1.8vw, 12px);
+      font-size: clamp(12px, 1.8vw, 13px);
       font-weight: 500;
       transition: all 0.2s ease;
-      -webkit-user-select: none;
-      user-select: none;
+      -webkit-app-region: no-drag;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--fg);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--primary), #7b5ed1);
+      color: white;
+      border: none;
+    }
+
+    .btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(195, 154, 240, 0.4);
     }
 
     .btn:hover {
@@ -233,14 +252,29 @@
     }
 
     .tasks-container.expanded {
-      max-height: 300px;
+      max-height: clamp(200px, 60vh, 400px);
       overflow-y: auto;
     }
 
     .task-input-group {
       display: flex;
-      gap: 4px;
-      flex-shrink: 0;
+      gap: 8px;
+      margin-top: 10px;
+      -webkit-app-region: no-drag;
+    }
+
+    .task-input {
+      flex: 1;
+      padding: clamp(6px, 1%, 8px) clamp(8px, 1.5%, 12px);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--fg);
+      font-family: inherit;
+      font-size: clamp(12px, 1.8vw, 14px);
+      outline: none;
+      transition: border-color 0.2s ease;
+      -webkit-app-region: no-drag;
     }
 
     .task-input {
@@ -266,16 +300,22 @@
     }
 
     .task-add-btn {
-      padding: clamp(4px, 1%, 6px) clamp(8px, 1.2%, 10px);
-      border: none;
-      border-radius: 4px;
+      padding: clamp(6px, 1.2%, 8px) clamp(12px, 2.5%, 16px);
       background: var(--primary);
       color: white;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: clamp(10px, 1.6vw, 11px);
+      font-size: clamp(12px, 1.8vw, 13px);
       font-weight: 600;
       transition: all 0.2s ease;
-      flex-shrink: 0;
+      -webkit-app-region: no-drag;
+    }
+
+    .task-add-btn:hover {
+      background: #b58ae0;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(195, 154, 240, 0.4);
     }
 
     .task-add-btn:hover {
@@ -311,6 +351,7 @@
       margin-top: 1px;
       cursor: pointer;
       accent-color: var(--primary);
+      -webkit-app-region: no-drag;
     }
 
     .task-text {
@@ -342,6 +383,7 @@
       border-radius: 3px;
       transition: all 0.2s ease;
       flex-shrink: 0;
+      -webkit-app-region: no-drag;
     }
 
     .task-delete:hover {
@@ -388,14 +430,16 @@
     }
 
     .lang-btn {
-      padding: clamp(3px, 0.8%, 4px) clamp(6px, 1.2%, 8px);
-      border: none;
+      padding: clamp(4px, 1%, 6px) clamp(10px, 2%, 14px);
       background: transparent;
+      border: 1px solid var(--border);
       color: var(--fg-muted);
+      border-radius: 6px;
       cursor: pointer;
-      font-size: clamp(9px, 1.4vw, 10px);
+      font-size: clamp(10px, 1.6vw, 11px);
       font-weight: 600;
       transition: all 0.2s ease;
+      -webkit-app-region: no-drag;
     }
 
     .lang-btn.active {
@@ -406,6 +450,98 @@
 
     .lang-btn:hover:not(.active) {
       background: var(--bg-secondary);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       ANIMATIONS
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    @keyframes timerTick {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.01);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .timer-section {
+      animation: slideInDown 0.4s ease-out;
+    }
+
+    .controls {
+      animation: slideInUp 0.4s ease-out 0.1s both;
+    }
+
+    .quote-section {
+      animation: fadeIn 0.3s ease-out 0.2s both;
+    }
+
+    .tasks-wrapper {
+      animation: slideInUp 0.4s ease-out 0.3s both;
+    }
+
+    .timer-display {
+      animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) 3s infinite;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .task-add-btn:active {
+      transform: scale(0.97);
+    }
+
+    .task-item {
+      animation: slideInUp 0.2s ease-out;
+    }
+
+    .task-item:hover {
+      animation: none;
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -537,6 +673,29 @@
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const quoteSection = document.getElementById('quoteSection');
+    const tasksContainer = document.getElementById('tasksContainer');
+    const taskList = document.getElementById('taskList');
+    const taskInput = document.getElementById('taskInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const langEn = document.getElementById('langEn');
+    const langAr = document.getElementById('langAr');
+
+    // ────────────────────────────────────────────────────────────────
+    // IPC LISTENERS (Sync with main app)
+    // ────────────────────────────────────────────────────────────────
+
+    if (window.electronAPI?.onIPC) {
+      window.electronAPI.onIPC('pomodoro-state-changed', (newState) => {
+        // Update widget state from main app
+        state.mode = newState.mode || state.mode;
+        state.timeRemaining = newState.timeRemaining || state.timeRemaining;
+        state.isRunning = newState.isRunning || state.isRunning;
+        state.sessionCount = newState.sessionCount || state.sessionCount;
+        state.totalSessions = newState.totalSessions || state.totalSessions;
+        render();
+      });
+    }
     const quoteSection = document.getElementById('quoteSection');
     const tasksHeader = document.getElementById('tasksHeader');
     const tasksToggle = document.getElementById('tasksToggle');
@@ -690,9 +849,26 @@
     // EVENTS
     // ────────────────────────────────────────────────────────────────
 
-    playBtn.addEventListener('click', startTimer);
-    pauseBtn.addEventListener('click', pauseTimer);
-    resetBtn.addEventListener('click', resetTimer);
+    playBtn.addEventListener('click', () => {
+      startTimer();
+      if (window.electronAPI?.ipcSend) {
+        window.electronAPI.ipcSend('widget-timer-action', { action: 'start' });
+      }
+    });
+    
+    pauseBtn.addEventListener('click', () => {
+      pauseTimer();
+      if (window.electronAPI?.ipcSend) {
+        window.electronAPI.ipcSend('widget-timer-action', { action: 'pause' });
+      }
+    });
+    
+    resetBtn.addEventListener('click', () => {
+      resetTimer();
+      if (window.electronAPI?.ipcSend) {
+        window.electronAPI.ipcSend('widget-timer-action', { action: 'reset' });
+      }
+    });
 
     tasksHeader.addEventListener('click', () => {
       state.tasksExpanded = !state.tasksExpanded;
