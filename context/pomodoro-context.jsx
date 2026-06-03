@@ -53,6 +53,56 @@ export function PomodoroProvider({ children }) {
     }
   }, [timerState, settings, currentQuote, tasks, language])
 
+  // Listen for widget actions and handle them
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.electronAPI) {
+      window.electronAPI.onWidgetAction((action) => {
+        switch (action.type) {
+          case 'timer:start':
+            setTimerState(prev => {
+              if (prev.mode === 'work' && !prev.isRunning) {
+                setCurrentQuote(getRandomQuote())
+              }
+              return { ...prev, isRunning: true }
+            })
+            break
+          case 'timer:pause':
+            setTimerState(prev => ({ ...prev, isRunning: false }))
+            break
+          case 'timer:reset':
+            const duration = timerState.mode === 'work' 
+              ? settings.workDuration 
+              : timerState.mode === 'shortBreak'
+                ? settings.shortBreakDuration
+                : settings.longBreakDuration
+            setTimerState(prev => ({
+              ...prev,
+              timeRemaining: duration * 60,
+              isRunning: false,
+            }))
+            break
+          case 'task:add':
+            setTasks(prev => [...prev, { 
+              id: Date.now().toString(), 
+              text: action.payload.text, 
+              completed: false 
+            }])
+            break
+          case 'task:delete':
+            setTasks(prev => prev.filter(t => t.id !== action.payload.id))
+            break
+          case 'task:toggle':
+            setTasks(prev => prev.map(t => 
+              t.id === action.payload.id ? { ...t, completed: !t.completed } : t
+            ))
+            break
+          default:
+            break
+        }
+      })
+    }
+  }, [timerState.mode, settings])
+
   // Timer logic
   useEffect(() => {
     if (timerState.isRunning) {

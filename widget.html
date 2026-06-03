@@ -630,33 +630,21 @@
 
     const startTimer = () => {
       if (widgetState.timerState.isRunning) return;
-      widgetState.timerState.isRunning = true;
-      timerInterval = setInterval(() => {
-        if (widgetState.timerState.timeRemaining > 0) {
-          widgetState.timerState.timeRemaining--;
-          render();
-        } else {
-          clearInterval(timerInterval);
-          nextSession();
-        }
-      }, 1000);
-      render();
+      if (window.electronAPI) {
+        window.electronAPI.sendWidgetAction({ type: 'timer:start' });
+      }
     };
 
     const pauseTimer = () => {
-      widgetState.timerState.isRunning = false;
-      if (timerInterval) clearInterval(timerInterval);
-      render();
+      if (window.electronAPI) {
+        window.electronAPI.sendWidgetAction({ type: 'timer:pause' });
+      }
     };
 
     const resetTimer = () => {
-      widgetState.timerState.isRunning = false;
-      if (timerInterval) clearInterval(timerInterval);
-      widgetState.timerState.mode = 'work';
-      widgetState.timerState.timeRemaining = widgetState.settings.workDuration * 60;
-      widgetState.timerState.sessionCount = 0;
-      currentQuote = getRandomQuote();
-      render();
+      if (window.electronAPI) {
+        window.electronAPI.sendWidgetAction({ type: 'timer:reset' });
+      }
     };
 
     const nextSession = () => {
@@ -675,36 +663,33 @@
     // TASKS
     // ─────────────────────────────────────────────────────────────
 
-    const saveTasks = () => {
-      localStorage.setItem('pomodoro-tasks', JSON.stringify(widgetState.tasks));
-    };
-
     const addTask = () => {
       const text = taskInput.value.trim();
       if (!text) return;
-      const task = {
-        id: Date.now().toString(),
-        text,
-        completed: false,
-      };
-      widgetState.tasks.push(task);
-      saveTasks();
+      if (window.electronAPI) {
+        window.electronAPI.sendWidgetAction({ 
+          type: 'task:add', 
+          payload: { text } 
+        });
+      }
       taskInput.value = '';
-      render();
     };
 
     const deleteTask = (id) => {
-      widgetState.tasks = widgetState.tasks.filter(t => t.id !== id);
-      saveTasks();
-      render();
+      if (window.electronAPI) {
+        window.electronAPI.sendWidgetAction({ 
+          type: 'task:delete', 
+          payload: { id } 
+        });
+      }
     };
 
     const toggleTask = (id) => {
-      const task = widgetState.tasks.find(t => t.id === id);
-      if (task) {
-        task.completed = !task.completed;
-        saveTasks();
-        render();
+      if (window.electronAPI) {
+        window.electronAPI.sendWidgetAction({ 
+          type: 'task:toggle', 
+          payload: { id } 
+        });
       }
     };
 
