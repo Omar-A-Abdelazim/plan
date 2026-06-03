@@ -19,6 +19,7 @@ import {
   Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { WidgetSettingsButton } from '@/components/widget-settings'
 
 const PRIORITY_STYLES = {
   high: 'bg-destructive/20 text-destructive',
@@ -130,12 +131,12 @@ export function Pomodoro() {
     <div className="h-full flex">
       {/* Main Timer Area */}
       <div className={cn(
-        "flex-1 flex flex-col items-center justify-center p-8 transition-colors duration-500",
+        "flex-1 flex flex-col items-center justify-center p-6 transition-colors duration-500",
         currentStyle.bg
       )}>
         {/* Quote Display */}
         {currentQuote && timerState.mode === 'work' && (
-          <div className="max-w-md text-center mb-8 animate-fade-in">
+          <div className="max-w-md text-center mb-4 animate-fade-in">
             <div className="flex items-center justify-center gap-2 mb-2">
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-xs text-muted-foreground uppercase tracking-wider">Focus Quote</span>
@@ -148,7 +149,7 @@ export function Pomodoro() {
         )}
 
         {/* Mode Tabs */}
-        <div className="flex items-center gap-2 mb-8">
+        <div className="flex items-center gap-2 mb-6">
           {[
             { mode: 'work', label: 'Focus', icon: Brain },
             { mode: 'shortBreak', label: 'Short Break', icon: Coffee },
@@ -171,7 +172,7 @@ export function Pomodoro() {
         </div>
 
         {/* Timer Circle */}
-        <div className="relative w-80 h-80 mb-8">
+        <div className="relative w-72 h-72 mb-6">
           {/* SVG Progress Ring */}
           <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
             {/* Background ring */}
@@ -243,10 +244,12 @@ export function Pomodoro() {
           >
             <Settings className="w-6 h-6" />
           </button>
+
+          <WidgetSettingsButton />
         </div>
 
         {/* Stats */}
-        <div className="flex items-center gap-8 mt-8">
+        <div className="flex items-center gap-6 mt-4">
           <div className="text-center">
             <span className="text-3xl font-bold text-foreground">{pomodoroStats.pomodorosCompleted}</span>
             <p className="text-xs text-muted-foreground">Pomodoros Today</p>
@@ -261,7 +264,7 @@ export function Pomodoro() {
         {/* Notification Toggle */}
         <button
           onClick={handleToggleNotifications}
-          className="mt-6 flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="mt-3 flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           {notificationsEnabled ? (
             <>
