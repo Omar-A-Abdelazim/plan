@@ -616,7 +616,7 @@
   <script>
     // ────────────────────────────────────────────────────────────────
     // QUOTES
-    // ────────────────────────────────────────────────────────────────
+    // ───────────────────────────────────────────���────────────────────
 
     const QUOTES = {
       en: [
@@ -732,9 +732,17 @@
         if (state.timeRemaining > 0) {
           state.timeRemaining--;
           render();
+          // Broadcast state every second
+          if (window.electronAPI?.ipcSend) {
+            window.electronAPI.ipcSend('pomodoro-state-update', state);
+          }
         } else {
           clearInterval(timerInterval);
           nextSession();
+          // Broadcast state on session change
+          if (window.electronAPI?.ipcSend) {
+            window.electronAPI.ipcSend('pomodoro-state-update', state);
+          }
         }
       }, 1000);
       render();
@@ -851,22 +859,25 @@
 
     playBtn.addEventListener('click', () => {
       startTimer();
+      // Broadcast state to main app
       if (window.electronAPI?.ipcSend) {
-        window.electronAPI.ipcSend('widget-timer-action', { action: 'start' });
+        window.electronAPI.ipcSend('pomodoro-state-update', state);
       }
     });
     
     pauseBtn.addEventListener('click', () => {
       pauseTimer();
+      // Broadcast state to main app
       if (window.electronAPI?.ipcSend) {
-        window.electronAPI.ipcSend('widget-timer-action', { action: 'pause' });
+        window.electronAPI.ipcSend('pomodoro-state-update', state);
       }
     });
     
     resetBtn.addEventListener('click', () => {
       resetTimer();
+      // Broadcast state to main app
       if (window.electronAPI?.ipcSend) {
-        window.electronAPI.ipcSend('widget-timer-action', { action: 'reset' });
+        window.electronAPI.ipcSend('pomodoro-state-update', state);
       }
     });
 
