@@ -495,7 +495,8 @@
   <div class="controls">
     <button class="btn primary" id="playBtn">Start</button>
     <button class="btn" id="pauseBtn" style="display: none;">Pause</button>
-    <button class="btn" id="resetBtn">Reset</button>
+    <button class="btn" id="resetBtn">Reset Timer</button>
+    <button class="btn" id="resetCycleBtn">Reset Cycle</button>
   </div>
 
   <!-- Quote -->
@@ -599,6 +600,7 @@
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const resetCycleBtn = document.getElementById('resetCycleBtn');
     const quoteSection = document.getElementById('quoteSection');
     const tasksHeader = document.getElementById('tasksHeader');
     const tasksToggle = document.getElementById('tasksToggle');
@@ -647,16 +649,10 @@
       }
     };
 
-    const nextSession = () => {
-      if (widgetState.timerState.mode === 'work') {
-        widgetState.timerState.sessionCount++;
-        widgetState.timerState.mode = widgetState.timerState.sessionCount % widgetState.timerState.totalSessions === 0 ? 'longBreak' : 'shortBreak';
-      } else {
-        widgetState.timerState.mode = 'work';
+    const resetCycle = () => {
+      if (window.electronAPI) {
+        window.electronAPI.sendWidgetAction({ type: 'timer:resetCycle' });
       }
-      widgetState.timerState.timeRemaining = config[widgetState.timerState.mode].duration;
-      currentQuote = getRandomQuote();
-      render();
     };
 
     // ─────────────────────────────────────────────────────────────
@@ -734,7 +730,6 @@
       }
 
       // Update task list
-      console.log("[v0] Tasks:", widgetState.tasks);
       if (widgetState.tasks.length === 0) {
         taskList.innerHTML = '<div class="empty-tasks">No tasks yet</div>';
       } else {
@@ -763,6 +758,7 @@
     playBtn.addEventListener('click', startTimer);
     pauseBtn.addEventListener('click', pauseTimer);
     resetBtn.addEventListener('click', resetTimer);
+    resetCycleBtn.addEventListener('click', resetCycle);
 
     addTaskBtn.addEventListener('click', addTask);
     taskInput.addEventListener('keypress', (e) => {

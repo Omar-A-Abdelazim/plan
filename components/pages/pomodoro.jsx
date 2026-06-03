@@ -34,9 +34,8 @@ export function Pomodoro() {
     startTimer, 
     pauseTimer, 
     resetTimer, 
-    setMode,
+    resetCycle,
     updateSettings,
-    nextSession,
     setOnComplete,
     requestNotificationPermission,
   } = usePomodoro()
@@ -147,27 +146,11 @@ export function Pomodoro() {
           </div>
         )}
 
-        {/* Mode Tabs */}
+        {/* Mode Display - Read Only */}
         <div className="flex items-center gap-2 mb-6">
-          {[
-            { mode: 'work', label: 'Focus', icon: Brain },
-            { mode: 'shortBreak', label: 'Short Break', icon: Coffee },
-            { mode: 'longBreak', label: 'Long Break', icon: Coffee },
-          ].map(({ mode, label, icon: Icon }) => (
-            <button
-              key={mode}
-              onClick={() => setMode(mode)}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all",
-                timerState.mode === mode
-                  ? `${modeStyles[mode].bg} ${modeStyles[mode].text}`
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              )}
-            >
-              <Icon className="w-4 h-4" />
-              {label}
-            </button>
-          ))}
+          <span className={cn("text-sm font-medium", currentStyle.text)}>
+            {timerState.mode === 'work' ? 'Focus Session' : timerState.mode === 'shortBreak' ? 'Short Break' : 'Long Break'}
+          </span>
         </div>
 
         {/* Timer Circle */}
@@ -215,9 +198,9 @@ export function Pomodoro() {
         {/* Controls */}
         <div className="flex items-center gap-4">
           <button
-            onClick={resetTimer}
+            onClick={resetCycle}
             className="p-3 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
-            title="Reset"
+            title="Reset Cycle"
           >
             <RotateCcw className="w-6 h-6" />
           </button>

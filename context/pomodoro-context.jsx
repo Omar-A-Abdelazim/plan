@@ -70,6 +70,7 @@ export function PomodoroProvider({ children }) {
             setTimerState(prev => ({ ...prev, isRunning: false }))
             break
           case 'timer:reset':
+            // Check if there's a dedicated reset:cycle action
             const duration = timerState.mode === 'work' 
               ? settings.workDuration 
               : timerState.mode === 'shortBreak'
@@ -81,15 +82,23 @@ export function PomodoroProvider({ children }) {
               isRunning: false,
             }))
             break
+          case 'timer:resetCycle':
+            setTimerState(prev => ({
+              ...prev,
+              mode: 'work',
+              timeRemaining: settings.workDuration * 60,
+              isRunning: false,
+              sessionCount: 0,
+            }))
+            setCurrentQuote(getRandomQuote())
+            break
           case 'task:add':
-            console.log("[v0] Adding task:", action.payload);
             setTasks(prev => {
               const newTasks = [...prev, { 
                 id: Date.now().toString(), 
                 text: action.payload.text, 
                 completed: false 
               }]
-              console.log("[v0] Tasks after add:", newTasks);
               return newTasks
             })
             break
@@ -139,7 +148,6 @@ export function PomodoroProvider({ children }) {
             }
             
             // Auto-transition to next session
-            console.log("[v0] Timer completed, auto-transitioning", { mode: prev.mode, sessionCount: prev.sessionCount });
             const newSessionCount = prev.mode === 'work' ? prev.sessionCount + 1 : prev.sessionCount
             const isLongBreak = newSessionCount >= settings.sessionsBeforeLongBreak
             
@@ -207,7 +215,26 @@ export function PomodoroProvider({ children }) {
     }))
   }, [timerState.mode, settings])
 
+  const resetCycle = useCallback(() => {
+    setTimerState(prev => ({
+      ...prev,
+      mode: 'work',
+      timeRemaining: settings.workDuration * 60,
+      isRunning: false,
+      sessionCount: 0,
+    }))
+    setCurrentQuote(getRandomQuote())
+  }, [settings.workDuration])
+
+  // DEPRECATED: setMode should NOT be used while timer is running
+  // Mode switching is now ONLY controlled by timer logic
   const setMode = useCallback((mode) => {
+    // Only allow mode switching if timer is NOT running
+    if (timerState.isRunning) {
+      console.warn("[v0] Cannot switch modes while timer is running. Use resetCycle() or let timer auto-transition.")
+      return
+    }
+    
     const duration = mode === 'work' 
       ? settings.workDuration 
       : mode === 'shortBreak'
@@ -224,7 +251,7 @@ export function PomodoroProvider({ children }) {
     if (mode === 'work') {
       setCurrentQuote(getRandomQuote())
     }
-  }, [settings])
+  }, [settings, timerState.isRunning])
 
   const updateSettings = useCallback((newSettings) => {
     setSettings(newSettings)
@@ -316,6 +343,7 @@ export function PomodoroProvider({ children }) {
       startTimer,
       pauseTimer,
       resetTimer,
+      resetCycle,
       setMode,
       updateSettings,
       nextSession,
