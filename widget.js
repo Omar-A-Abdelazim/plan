@@ -1,25 +1,22 @@
 const { BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
-const COMPACT = { width: 300, height: 180 };
-const FULL    = { width: 350, height: 500 };
-
 function createWidgetWindow() {
   const { screen } = require('electron');
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
   const widgetWindow = new BrowserWindow({
-    width:  COMPACT.width,
-    height: COMPACT.height,
-    x: width  - COMPACT.width  - 20,
-    y: height - COMPACT.height - 20,
+    width: 800,
+    height: 600,
+    x: width - 820,
+    y: height - 620,
     frame: false,
     alwaysOnTop: true,
     resizable: true,
-    minWidth: 300,
-    minHeight: 180,
-    transparent: true,
-    backgroundColor: '#00000000',
+    minWidth: 500,
+    minHeight: 300,
+    transparent: false,
+    backgroundColor: '#0f0f1a',
     show: false,
     hasShadow: true,
     webPreferences: {
@@ -38,15 +35,23 @@ function createWidgetWindow() {
     widgetWindow.focus();
   });
 
-  // IPC: toggle compact <-> full
-  ipcMain.on('widget-set-mode', (event, mode) => {
-    // Don't force resize on mode switch; let user maintain their chosen size
-    // This allows flexible resizing independent of mode changes
+  // IPC: Add task
+  ipcMain.on('widget-add-task', (event, taskText) => {
+    widgetWindow.webContents.send('task-added', taskText);
   });
 
-  // IPC: close / minimize
-  ipcMain.on('widget-close',    () => widgetWindow.hide());
-  ipcMain.on('widget-minimize', () => widgetWindow.minimize());
+  // IPC: Toggle task
+  ipcMain.on('widget-toggle-task', (event, taskId) => {
+    widgetWindow.webContents.send('task-toggled', taskId);
+  });
+
+  // IPC: Delete task
+  ipcMain.on('widget-delete-task', (event, taskId) => {
+    widgetWindow.webContents.send('task-deleted', taskId);
+  });
+
+  // IPC: Close widget
+  ipcMain.on('widget-close', () => widgetWindow.hide());
 
   widgetWindow.webContents.on('will-navigate', (event, url) => {
     if (!url.startsWith('file://')) event.preventDefault();

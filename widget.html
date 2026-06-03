@@ -1,136 +1,108 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PlanFlow — Pomodoro Widget</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     :root {
-      /* Dark mode colors from globals.css */
-      --background: #1f1f2e;
-      --foreground: #e8e8f0;
-      --muted: #38384a;
-      --muted-foreground: #a6a6b8;
-      --primary: #9d7ce8;
-      --secondary: #5a9fd4;
-      --accent: #fbbf24;
-      --border: #3f3f52;
-      --card: #282839;
+      --bg-primary: #0f0f1a;
+      --bg-secondary: #1a1a2e;
+      --bg-tertiary: #252538;
+      --fg-primary: #e8e8f0;
+      --fg-secondary: #a6a6b8;
+      --fg-muted: #7a7a8e;
+      --accent-primary: #8b5cf6;
+      --accent-secondary: #6366f1;
+      --accent-tertiary: #ec4899;
+      --border-color: rgba(139, 92, 246, 0.2);
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
+      --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.3);
     }
 
     html, body {
-      background: rgba(15, 15, 26, 0.45);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      width: 100%;
+      height: 100%;
+      background: var(--bg-primary);
+      color: var(--fg-primary);
+      font-family: 'Geist', -apple-system, system-ui, sans-serif;
       overflow: hidden;
       user-select: none;
       -webkit-font-smoothing: antialiased;
-      font-family: 'Geist', system-ui, -apple-system, sans-serif;
-      color: var(--foreground);
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      width: 100vw;
     }
 
-    .card {
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CONTAINER & LAYOUT
+       ═══════════════════════════════════════════════════════════════ */
+
+    .widget-container {
+      display: flex;
       width: 100%;
       height: 100%;
-      background: rgba(15, 15, 26, 0.45);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(123, 47, 190, 0.3);
-      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
-      -webkit-app-region: drag;
-      display: flex;
-      flex-direction: column;
     }
 
-    /* ══════════════════════════════════════════════════
-       COMPACT MODE (Timer + Quote + Expand)
-       ══════════════════════════════════════════════════ */
-
-    .compact-view {
-      width: 100%;
-      height: 100%;
+    .widget-header {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: clamp(12px, 5%, 20px);
-      gap: clamp(8px, 3%, 16px);
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(26, 26, 46, 0.6);
+      border-bottom: 1px solid var(--border-color);
       -webkit-app-region: drag;
-      min-height: 180px;
+      user-select: none;
     }
 
-    .compact-timer {
-      font-size: clamp(36px, 12vw, 64px);
-      font-weight: 700;
-      letter-spacing: -2px;
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-      text-align: center;
-      transition: color 0.3s ease;
-      flex-shrink: 0;
+    .widget-header-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fg-secondary);
     }
 
-    .compact-timer.work { color: #c39af0; }
-    .compact-timer.shortBreak { color: #7ec8f7; }
-    .compact-timer.longBreak { color: #fbb96b; }
-
-    .compact-quote {
-      font-size: clamp(11px, 2vw, 14px);
-      color: var(--muted-foreground);
-      line-height: 1.5;
-      text-align: center;
-      font-style: italic;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      max-width: 100%;
-      padding: 0 8px;
-    }
-
-    .compact-actions {
+    .header-controls {
       display: flex;
       gap: 8px;
-      align-items: center;
-      justify-content: center;
       -webkit-app-region: no-drag;
-      flex-shrink: 0;
     }
 
-    .icon-btn {
+    .header-btn {
+      width: 24px;
+      height: 24px;
+      border: none;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--fg-secondary);
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
-      border: none;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.06);
-      color: var(--muted-foreground);
-      cursor: pointer;
       transition: all 0.2s ease;
-      -webkit-app-region: no-drag;
     }
 
-    .icon-btn:hover {
-      color: var(--foreground);
-      background: rgba(255,255,255,0.12);
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--fg-primary);
     }
 
-    .icon-btn svg {
-      width: 18px;
-      height: 18px;
+    .header-btn svg {
+      width: 14px;
+      height: 14px;
       stroke: currentColor;
       stroke-width: 2;
       stroke-linecap: round;
@@ -138,72 +110,206 @@
       fill: none;
     }
 
-    /* ══════════════════════════════════════════════════
-       FULL MODE (Complete Pomodoro Interface)
-       ══════════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════════════════
+       LEFT PANEL - TIMER & CONTROLS
+       ═══════════════════════════════════════════════════════════════ */
 
-    .full-view {
-      display: none;
-      width: 100%;
-      height: 100%;
+    .left-panel {
+      flex: 1;
+      display: flex;
       flex-direction: column;
-      padding: clamp(16px, 4%, 24px);
-      gap: clamp(12px, 2%, 20px);
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      gap: 24px;
+      border-right: 1px solid var(--border-color);
       overflow-y: auto;
-      overflow-x: hidden;
-      min-height: 180px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, transparent 100%);
     }
 
-    .full-view.active {
-      display: flex;
-    }
-
-    /* Header with Mode Tabs */
-    .mode-tabs {
-      display: flex;
-      gap: clamp(6px, 1.5%, 8px);
-      flex-wrap: wrap;
+    .session-badge {
+      display: inline-flex;
       align-items: center;
-      min-height: 32px;
-    }
-
-    .mode-tab {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: clamp(6px, 1%, 8px) clamp(10px, 2%, 14px);
-      border: none;
-      border-radius: 8px;
-      font-size: clamp(12px, 2vw, 13px);
-      font-weight: 500;
-      background: transparent;
-      color: var(--muted-foreground);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      -webkit-app-region: no-drag;
-      white-space: nowrap;
-    }
-
-    .mode-tab:hover {
-      background: rgba(255,255,255,0.05);
-    }
-
-    .mode-tab.active {
+      gap: 8px;
+      padding: 8px 16px;
       background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
       color: #c39af0;
     }
 
-    .mode-tab.active.secondary {
-      background: rgba(59, 130, 246, 0.15);
-      color: #7ec8f7;
+    .timer-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
     }
 
-    .mode-tab.active.accent {
-      background: rgba(251, 191, 36, 0.15);
-      color: #fbb96b;
+    .timer-value {
+      font-size: clamp(48px, 15vw, 96px);
+      font-weight: 700;
+      letter-spacing: -3px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .mode-tab svg {
+    .timer-label {
+      font-size: 13px;
+      color: var(--fg-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .quote-section {
+      max-width: 100%;
+      text-align: center;
+      padding: 16px;
+      background: rgba(139, 92, 246, 0.08);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 12px;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .quote-text {
+      font-size: 13px;
+      font-style: italic;
+      color: var(--fg-primary);
+      line-height: 1.6;
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .quote-author {
+      font-size: 11px;
+      color: var(--fg-secondary);
+    }
+
+    .controls-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--fg-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 12px;
+      font-weight: 500;
+      -webkit-app-region: no-drag;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .control-btn.primary {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: white;
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
+    }
+
+    .control-btn.primary:hover {
+      box-shadow: 0 12px 32px rgba(139, 92, 246, 0.45);
+      transform: translateY(-2px) scale(1.05);
+    }
+
+    .control-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .control-btn.primary svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       RIGHT PANEL - TASKS SIDEBAR
+       ═══════════════════════════════════════════════════════════════ */
+
+    .right-panel {
+      width: 240px;
+      display: flex;
+      flex-direction: column;
+      background: rgba(26, 26, 46, 0.4);
+      border-left: 1px solid var(--border-color);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .right-panel.collapsed {
+      width: 0;
+      border-left: none;
+      padding: 0;
+    }
+
+    .tasks-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-color);
+      -webkit-app-region: drag;
+      user-select: none;
+    }
+
+    .tasks-header-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .collapse-btn {
+      width: 24px;
+      height: 24px;
+      border: none;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--fg-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      -webkit-app-region: no-drag;
+    }
+
+    .collapse-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--fg-primary);
+    }
+
+    .collapse-btn svg {
       width: 16px;
       height: 16px;
       stroke: currentColor;
@@ -211,169 +317,90 @@
       stroke-linecap: round;
       stroke-linejoin: round;
       fill: none;
+      transition: transform 0.3s ease;
     }
 
-    /* Quote Section */
-    .quote-section {
-      display: none;
-      text-align: center;
-      animation: fadeIn 0.3s ease;
-      min-height: 60px;
+    .tasks-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .quote-section.visible {
-      display: block;
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      animation: slideIn 0.3s ease-out;
     }
 
-    .quote-label {
-      font-size: clamp(10px, 1.5vw, 11px);
-      color: var(--muted-foreground);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
+    .task-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .task-item.completed {
+      opacity: 0.6;
+    }
+
+    .task-item.completed .task-text {
+      text-decoration: line-through;
+      color: var(--fg-muted);
+    }
+
+    .task-checkbox {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: var(--accent-primary);
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 12px;
+      line-height: 1.5;
+      word-break: break-word;
+      color: var(--fg-primary);
+      transition: all 0.2s ease;
+    }
+
+    .task-delete {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      border: none;
+      background: transparent;
+      color: var(--fg-muted);
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      opacity: 0;
+      transition: all 0.2s ease;
+      -webkit-app-region: no-drag;
     }
 
-    .quote-label svg {
+    .task-item:hover .task-delete {
+      opacity: 1;
+      color: #ec4899;
+    }
+
+    .task-delete:hover {
+      transform: scale(1.1);
+    }
+
+    .task-delete svg {
       width: 14px;
       height: 14px;
-      fill: #c39af0;
-      flex-shrink: 0;
-    }
-
-    .quote-text {
-      font-size: clamp(13px, 2vw, 15px);
-      font-style: italic;
-      color: var(--foreground);
-      line-height: 1.6;
-      margin-bottom: 6px;
-    }
-
-    .quote-author {
-      font-size: clamp(10px, 1.5vw, 11px);
-      color: var(--muted-foreground);
-    }
-
-    /* Timer Display with SVG Ring */
-    .timer-display {
-      position: relative;
-      width: clamp(120px, 30vw, 160px);
-      height: clamp(120px, 30vw, 160px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: clamp(8px, 2%, 16px) 0;
-      flex-shrink: 0;
-    }
-
-    .timer-ring {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-    }
-
-    .timer-ring svg {
-      width: 100%;
-      height: 100%;
-      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.15));
-    }
-
-    .timer-bg-ring {
-      fill: none;
-      stroke: rgba(139, 92, 246, 0.1);
-      stroke-width: 2;
-    }
-
-    .timer-progress-ring {
-      fill: none;
-      stroke: #c39af0;
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-dasharray: 282;
-      stroke-dashoffset: 282;
-      transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
-      transform-origin: 50% 50%;
-      transform: rotate(-90deg);
-    }
-
-    .timer-progress-ring.secondary { stroke: #7ec8f7; }
-    .timer-progress-ring.accent { stroke: #fbb96b; }
-
-    .timer-text {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-    }
-
-    .timer-time {
-      font-size: clamp(28px, 8vw, 42px);
-      font-weight: 700;
-      letter-spacing: -1.5px;
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-      color: #c39af0;
-      transition: color 0.3s ease;
-    }
-
-    .timer-time.secondary { color: #7ec8f7; }
-    .timer-time.accent { color: #fbb96b; }
-
-    .timer-session {
-      font-size: clamp(10px, 1.5vw, 11px);
-      color: var(--muted-foreground);
-    }
-
-    /* Controls */
-    .controls {
-      display: flex;
-      gap: clamp(8px, 2%, 12px);
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      min-height: 56px;
-    }
-
-    .control-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: clamp(36px, 8vw, 44px);
-      height: clamp(36px, 8vw, 44px);
-      border: none;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.06);
-      color: var(--muted-foreground);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      -webkit-app-region: no-drag;
-      flex-shrink: 0;
-    }
-
-    .control-btn:hover {
-      background: rgba(255,255,255,0.12);
-      color: var(--foreground);
-    }
-
-    .control-btn.play-btn {
-      width: clamp(44px, 10vw, 56px);
-      height: clamp(44px, 10vw, 56px);
-      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-      color: white;
-    }
-
-    .control-btn.play-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-    }
-
-    .control-btn svg {
-      width: clamp(16px, 4vw, 20px);
-      height: clamp(16px, 4vw, 20px);
       stroke: currentColor;
       stroke-width: 2;
       stroke-linecap: round;
@@ -381,130 +408,70 @@
       fill: none;
     }
 
-    .control-btn.play-btn svg {
-      width: clamp(18px, 5vw, 24px);
-      height: clamp(18px, 5vw, 24px);
-    }
-
-    /* Stats */
-    .stats {
+    .tasks-empty {
       display: flex;
+      align-items: center;
       justify-content: center;
-      gap: clamp(20px, 5%, 40px);
-      padding: clamp(12px, 2%, 16px) 0;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      flex-wrap: wrap;
-      min-height: 70px;
-    }
-
-    .stat-item {
+      height: 100%;
+      color: var(--fg-muted);
+      font-size: 12px;
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
+      padding: 20px;
     }
 
-    .stat-value {
-      font-size: clamp(20px, 6vw, 28px);
-      font-weight: 700;
-      color: var(--foreground);
-    }
-
-    .stat-label {
-      font-size: clamp(10px, 1.5vw, 11px);
-      color: var(--muted-foreground);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* Footer */
-    .footer {
-      display: flex;
-      gap: clamp(8px, 2%, 12px);
-      align-items: center;
-      justify-content: center;
-      padding: clamp(8px, 1.5%, 12px) 0;
-      flex-wrap: wrap;
-      flex-shrink: 0;
-    }
-
-    .notification-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: clamp(4px, 1%, 6px) clamp(8px, 1.5%, 12px);
-      border: none;
+    .add-task-input {
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 6px;
-      background: transparent;
-      color: var(--muted-foreground);
-      cursor: pointer;
-      font-size: clamp(11px, 1.5vw, 12px);
-      font-weight: 500;
+      color: var(--fg-primary);
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
       transition: all 0.2s ease;
-      -webkit-app-region: no-drag;
-      white-space: nowrap;
+      margin: 8px 12px 12px;
     }
 
-    .notification-btn:hover {
-      color: var(--foreground);
-      background: rgba(255,255,255,0.06);
+    .add-task-input:focus {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
     }
 
-    .notification-btn svg {
-      width: clamp(14px, 3vw, 16px);
-      height: clamp(14px, 3vw, 16px);
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-      flex-shrink: 0;
+    .add-task-input::placeholder {
+      color: var(--fg-muted);
     }
 
-    .lang-divider {
-      width: 1px;
-      height: clamp(12px, 3vw, 16px);
-      background: rgba(255,255,255,0.15);
-    }
+    /* ═══════════════════════════════════════════════════════════════
+       ANIMATIONS
+       ═══════════════════════════════════════════════════════════════ */
 
-    .lang-toggle {
-      display: flex;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .lang-toggle button {
-      padding: clamp(4px, 1%, 6px) clamp(8px, 1%, 12px);
-      border: none;
-      background: transparent;
-      color: var(--muted-foreground);
-      cursor: pointer;
-      font-size: clamp(10px, 1.5vw, 11px);
-      font-weight: 600;
-      transition: all 0.2s ease;
-      -webkit-app-region: no-drag;
-      white-space: nowrap;
-    }
-
-    .lang-toggle button.active {
-      background: rgba(139, 92, 246, 0.2);
-      color: #c39af0;
-    }
-
-    .lang-toggle button:not(.active):hover {
-      background: rgba(255,255,255,0.05);
-    }
-
-    /* Animations */
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    /* Scrollbar */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SCROLLBAR
+       ═══════════════════════════════════════════════════════════════ */
+
     ::-webkit-scrollbar {
       width: 6px;
     }
@@ -522,421 +489,302 @@
       background: rgba(139, 92, 246, 0.5);
     }
   </style>
-  </style>
 </head>
 <body>
-<div class="card">
-  <!-- COMPACT VIEW: Timer + Quote + Expand Button -->
-  <div class="compact-view" id="compactView">
-    <div class="compact-timer work" id="cTimer">25:00</div>
-    <div class="compact-quote" id="cQuote">"The secret of getting ahead is getting started."</div>
-    <div class="compact-actions">
-      <button class="icon-btn" id="expandBtn" title="Expand">
-        <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- FULL VIEW: Complete Pomodoro Interface -->
-  <div class="full-view" id="fullView">
-    <!-- Mode Tabs -->
-    <div class="mode-tabs">
-      <button class="mode-tab active" id="modeWork" data-mode="work">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle></svg>
-        Focus
-      </button>
-      <button class="mode-tab" id="modeShortBreak" data-mode="shortBreak">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path></svg>
-        Short Break
-      </button>
-      <button class="mode-tab" id="modeLongBreak" data-mode="longBreak">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path></svg>
-        Long Break
-      </button>
-      <button class="icon-btn" style="margin-left: auto; width: 32px; height: 32px;" id="collapseBtn" title="Collapse">
-        <svg viewBox="0 0 24 24"><polyline points="9 3 3 3 3 9"></polyline><polyline points="21 21 21 15 15 15"></polyline><line x1="3" y1="21" x2="10" y2="14"></line><line x1="21" y1="3" x2="14" y2="10"></line></svg>
-      </button>
-    </div>
-
-    <!-- Quote (Work Mode Only) -->
-    <div class="quote-section" id="quoteSection">
-      <div class="quote-label">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-4.716-5-7-5-2.232 0-5 1.757-5 5 0 2 1.238 4.5 3 5.5 1.5 0 2 1 2 2s-.5 2-2 2"></path><path d="M15 21c3 0 7-1 7-8V5c0-1.25-4.716-5-7-5-2.232 0-5 1.757-5 5 0 2 1.238 4.5 3 5.5 1.5 0 2 1 2 2s-.5 2-2 2"></path></svg>
-        Focus Quote
-      </div>
-      <div class="quote-text" id="fQuoteText">"The secret of getting ahead is getting started."</div>
-      <div class="quote-author" id="fQuoteAuthor">— Napoleon Hill</div>
-    </div>
-
-    <!-- Timer Display -->
-    <div class="timer-display">
-      <div class="timer-ring">
-        <svg viewBox="0 0 100 100">
-          <circle class="timer-bg-ring" cx="50" cy="50" r="45"></circle>
-          <circle class="timer-progress-ring work" cx="50" cy="50" r="45" id="timerRing"></circle>
-        </svg>
-      </div>
-      <div class="timer-text">
-        <div class="timer-time work" id="fTimer">25:00</div>
-        <div class="timer-session" id="fSession">Session 1 of 4</div>
+  <div class="widget-container">
+    <!-- HEADER -->
+    <div class="widget-header">
+      <div class="widget-header-title">PlanFlow Pomodoro</div>
+      <div class="header-controls">
+        <button class="header-btn" id="settingsBtn" title="Settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </button>
+        <button class="header-btn" id="closeBtn" title="Close">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
     </div>
 
-    <!-- Controls -->
-    <div class="controls">
-      <button class="control-btn" id="fReset" title="Reset">
-        <svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"></path><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
-      </button>
-      <button class="control-btn play-btn" id="fPlay" title="Play/Pause">
-        <svg viewBox="0 0 24 24" class="play-icon"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        <svg viewBox="0 0 24 24" class="pause-icon" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-      </button>
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+      <div class="session-badge">
+        <span id="sessionMode">Focus Session</span>
+        <span id="sessionCount">1/4</span>
+      </div>
+
+      <div class="timer-display">
+        <div class="timer-value" id="timerDisplay">25:00</div>
+        <div class="timer-label">Remaining</div>
+      </div>
+
+      <div class="quote-section">
+        <div class="quote-text" id="quoteText">"The only way to do great work is to love what you do."</div>
+        <div class="quote-author" id="quoteAuthor">— Steve Jobs</div>
+      </div>
+
+      <div class="controls-group">
+        <button class="control-btn primary" id="playBtn" title="Start/Pause">
+          <svg viewBox="0 0 24 24" class="play-icon">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          <svg viewBox="0 0 24 24" class="pause-icon" style="display: none;">
+            <rect x="6" y="4" width="4" height="16"/>
+            <rect x="14" y="4" width="4" height="16"/>
+          </svg>
+        </button>
+        <button class="control-btn" id="resetBtn" title="Reset">
+          <svg viewBox="0 0 24 24">
+            <path d="M1 4v6h6M23 20v-6h-6"/>
+            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
-    <!-- Stats -->
-    <div class="stats">
-      <div class="stat-item">
-        <div class="stat-value" id="pomosCompleted">0</div>
-        <div class="stat-label">Pomodoros</div>
+    <!-- RIGHT PANEL -->
+    <div class="right-panel" id="tasksPanel">
+      <div class="tasks-header">
+        <div class="tasks-header-title">Tasks</div>
+        <button class="collapse-btn" id="toggleTasksBtn" title="Collapse">
+          <svg viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
       </div>
-      <div class="stat-item">
-        <div class="stat-value" id="minutesFocused">0</div>
-        <div class="stat-label">Minutes</div>
-      </div>
-    </div>
 
-    <!-- Footer -->
-    <div class="footer">
-      <button class="notification-btn" id="notifBtn" title="Notifications">
-        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-        <span>Notifications</span>
-      </button>
-      <div class="lang-divider"></div>
-      <div class="lang-toggle">
-        <button class="active" id="langEn">EN</button>
-        <button id="langAr">AR</button>
+      <input type="text" class="add-task-input" id="addTaskInput" placeholder="Add new task..." />
+
+      <div class="tasks-content" id="tasksList">
+        <div class="tasks-empty">No tasks yet. Add one to get started!</div>
       </div>
     </div>
   </div>
-</div>
-<script>
-  // ────────────────────────────────────────────────────────────────
-  // QUOTES DATABASE
-  // ────────────────────────────────────────────────────────────────
 
-  const QUOTES = {
-    en: [
-      { text: "The secret of getting ahead is getting started.", author: "Napoleon Hill" },
-      { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    // STATE & QUOTES
+    // ═══════════════════════════════════════════════════════════════
+
+    const QUOTES = [
       { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
       { text: "Focus is the gateway to success.", author: "Brian Tracy" },
-      { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
+      { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
       { text: "Success is not final, failure is not fatal.", author: "Winston Churchill" },
       { text: "The future depends on what you do today.", author: "Mahatma Gandhi" },
       { text: "Excellence is not a destination; it is a continuous journey.", author: "Brian Tracy" },
       { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
-    ],
-    ar: [
-      { text: "سر التقدم هو البدء.", author: "نابليون هيل" },
-      { text: "لا تراقب الساعة؛ افعل ما تفعله. استمر.", author: "سام ليفنسون" },
-      { text: "التركيز هو بوابة النجاح.", author: "برايان تريسي" },
-      { text: "العِلمُ نُورٌ وَالجَهلُ ظَلامٌ", author: "حكمة عربية" },
-      { text: "الصَّبرُ مِفتاحُ الفَرَج", author: "ابن القيم الجوزية" },
-    ],
-  };
+      { text: "You are what you do, not what you say you'll do.", author: "C.G. Jung" },
+    ];
 
-  // ────────────────────────────────────────────────────────────────
-  // STATE
-  // ────────────────────────────────────────────────────────────────
+    let timerState = {
+      mode: 'work',
+      timeRemaining: 25 * 60,
+      sessionCount: 1,
+      totalSessions: 4,
+      isRunning: false,
+    };
 
-  let isCompactMode = true;
-  let isRunning = false;
-  let currentMode = 'work';
-  let language = localStorage.getItem('planflow-widget-language') || 'en';
-  let notificationsEnabled = false;
+    let settings = {
+      workDuration: 25 * 60,
+      shortBreakDuration: 5 * 60,
+      longBreakDuration: 15 * 60,
+    };
 
-  let timerState = {
-    mode: 'work',
-    timeRemaining: 25 * 60,
-    sessionCount: 0,
-    totalSessions: 4,
-    isRunning: false,
-  };
+    let tasks = JSON.parse(localStorage.getItem('planflow-tasks') || '[]');
+    let currentQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    let timerInterval = null;
 
-  let settings = {
-    workDuration: 25,
-    shortBreakDuration: 5,
-    longBreakDuration: 15,
-    sessionsBeforeLongBreak: 4,
-  };
+    // ═══════════════════════════════════════════════════════════════
+    // DOM REFERENCES
+    // ═══════════════════════════════════════════════════════════════
 
-  let currentQuote = QUOTES[language][Math.floor(Math.random() * QUOTES[language].length)];
-  let timerInterval = null;
+    const timerDisplay = document.getElementById('timerDisplay');
+    const sessionMode = document.getElementById('sessionMode');
+    const sessionCount = document.getElementById('sessionCount');
+    const quoteText = document.getElementById('quoteText');
+    const quoteAuthor = document.getElementById('quoteAuthor');
+    const playBtn = document.getElementById('playBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const tasksPanel = document.getElementById('tasksPanel');
+    const toggleTasksBtn = document.getElementById('toggleTasksBtn');
+    const tasksList = document.getElementById('tasksList');
+    const addTaskInput = document.getElementById('addTaskInput');
+    const settingsBtn = document.getElementById('settingsBtn');
 
-  // ────────────────────────────────────────────────────────────────
-  // DOM REFERENCES
-  // ────────────────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════
+    // TIMER LOGIC
+    // ═══════════════════════════════════════════════════════════════
 
-  const compactView = document.getElementById('compactView');
-  const fullView = document.getElementById('fullView');
-  const cTimer = document.getElementById('cTimer');
-  const cQuote = document.getElementById('cQuote');
-  const expandBtn = document.getElementById('expandBtn');
-  const collapseBtn = document.getElementById('collapseBtn');
-  const fTimer = document.getElementById('fTimer');
-  const fSession = document.getElementById('fSession');
-  const fPlay = document.getElementById('fPlay');
-  const fReset = document.getElementById('fReset');
-  const fQuoteText = document.getElementById('fQuoteText');
-  const fQuoteAuthor = document.getElementById('fQuoteAuthor');
-  const quoteSection = document.getElementById('quoteSection');
-  const notifBtn = document.getElementById('notifBtn');
-  const langEn = document.getElementById('langEn');
-  const langAr = document.getElementById('langAr');
-  const modeWork = document.getElementById('modeWork');
-  const modeShortBreak = document.getElementById('modeShortBreak');
-  const modeLongBreak = document.getElementById('modeLongBreak');
-  const timerRing = document.getElementById('timerRing');
-  const pomosCompleted = document.getElementById('pomosCompleted');
-  const minutesFocused = document.getElementById('minutesFocused');
+    const formatTime = (seconds) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
 
-  // ────────────────────────────────────────────────────────────────
-  // TIMER LOGIC
-  // ────────────────────────────────────────────────────────────────
+    const updateDisplay = () => {
+      timerDisplay.textContent = formatTime(timerState.timeRemaining);
+      sessionCount.textContent = `${timerState.sessionCount}/${timerState.totalSessions}`;
+      
+      const modes = { work: 'Focus Session', shortBreak: 'Short Break', longBreak: 'Long Break' };
+      sessionMode.textContent = modes[timerState.mode];
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+      const playIcon = playBtn.querySelector('.play-icon');
+      const pauseIcon = playBtn.querySelector('.pause-icon');
+      if (timerState.isRunning) {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+      } else {
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+      }
+    };
 
-  const getTotalDuration = (mode) => {
-    if (mode === 'work') return settings.workDuration * 60;
-    if (mode === 'shortBreak') return settings.shortBreakDuration * 60;
-    return settings.longBreakDuration * 60;
-  };
-
-  const getProgress = () => {
-    const total = getTotalDuration(timerState.mode);
-    return ((total - timerState.timeRemaining) / total) * 100;
-  };
-
-  const updateTimerRing = () => {
-    const progress = getProgress();
-    const circumference = 2 * Math.PI * 45;
-    const offset = circumference * (1 - progress / 100);
-    timerRing.style.strokeDashoffset = offset;
-  };
-
-  const updateProgress = () => {
-    if (timerState.isRunning && timerState.timeRemaining > 0) {
-      timerState.timeRemaining--;
-      if (timerState.timeRemaining === 0) {
+    const tick = () => {
+      if (timerState.timeRemaining > 0) {
+        timerState.timeRemaining--;
+        updateDisplay();
+      } else {
         timerState.isRunning = false;
         nextSession();
       }
-    }
-  };
+    };
 
-  const setMode = (mode) => {
-    timerState.mode = mode;
-    currentMode = mode;
-    const duration = getTotalDuration(mode);
-    timerState.timeRemaining = duration;
+    const togglePlay = () => {
+      if (timerState.isRunning) {
+        timerState.isRunning = false;
+        if (timerInterval) clearInterval(timerInterval);
+      } else {
+        timerState.isRunning = true;
+        timerInterval = setInterval(tick, 1000);
+      }
+      updateDisplay();
+    };
 
-    // Update mode tabs
-    document.querySelectorAll('.mode-tab').forEach(tab => {
-      tab.classList.remove('active', 'secondary', 'accent');
-      if (tab.getAttribute('data-mode') === mode) {
-        tab.classList.add('active');
-        if (mode === 'shortBreak') {
-          tab.classList.add('secondary');
-        } else if (mode === 'longBreak') {
-          tab.classList.add('accent');
+    const resetTimer = () => {
+      timerState.isRunning = false;
+      if (timerInterval) clearInterval(timerInterval);
+      timerState.mode = 'work';
+      timerState.sessionCount = 1;
+      timerState.timeRemaining = settings.workDuration;
+      updateDisplay();
+    };
+
+    const nextSession = () => {
+      if (timerState.mode === 'work') {
+        timerState.sessionCount++;
+        if (timerState.sessionCount % timerState.totalSessions === 0) {
+          timerState.mode = 'longBreak';
+          timerState.timeRemaining = settings.longBreakDuration;
+        } else {
+          timerState.mode = 'shortBreak';
+          timerState.timeRemaining = settings.shortBreakDuration;
         }
+      } else {
+        timerState.mode = 'work';
+        timerState.timeRemaining = settings.workDuration;
+      }
+      currentQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+      updateQuote();
+      updateDisplay();
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // QUOTE MANAGEMENT
+    // ═══════════════════════════════════════════════════════════════
+
+    const updateQuote = () => {
+      quoteText.textContent = `"${currentQuote.text}"`;
+      quoteAuthor.textContent = `— ${currentQuote.author}`;
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // TASKS MANAGEMENT
+    // ═══════════════════════════════════════════════════════════════
+
+    const saveTasks = () => {
+      localStorage.setItem('planflow-tasks', JSON.stringify(tasks));
+    };
+
+    const renderTasks = () => {
+      if (tasks.length === 0) {
+        tasksList.innerHTML = '<div class="tasks-empty">No tasks yet. Add one to get started!</div>';
+        return;
+      }
+
+      tasksList.innerHTML = tasks.map(task => `
+        <div class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+          <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} />
+          <div class="task-text">${task.text}</div>
+          <button class="task-delete" title="Delete">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          </button>
+        </div>
+      `).join('');
+
+      // Attach event listeners
+      tasksList.querySelectorAll('.task-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+          const id = e.target.closest('.task-item').getAttribute('data-id');
+          const task = tasks.find(t => t.id === id);
+          if (task) {
+            task.completed = e.target.checked;
+            saveTasks();
+            renderTasks();
+          }
+        });
+      });
+
+      tasksList.querySelectorAll('.task-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.target.closest('.task-item').getAttribute('data-id');
+          tasks = tasks.filter(t => t.id !== id);
+          saveTasks();
+          renderTasks();
+        });
+      });
+    };
+
+    const addTask = (text) => {
+      if (!text.trim()) return;
+      tasks.push({
+        id: Date.now().toString(),
+        text: text.trim(),
+        completed: false,
+      });
+      saveTasks();
+      renderTasks();
+      addTaskInput.value = '';
+      addTaskInput.focus();
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // UI INTERACTIONS
+    // ═══════════════════════════════════════════════════════════════
+
+    playBtn.addEventListener('click', togglePlay);
+    resetBtn.addEventListener('click', resetTimer);
+    closeBtn.addEventListener('click', () => {
+      if (window.electron) window.electron.closeWidget();
+    });
+
+    toggleTasksBtn.addEventListener('click', () => {
+      tasksPanel.classList.toggle('collapsed');
+    });
+
+    addTaskInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        addTask(addTaskInput.value);
       }
     });
 
-    updateColors();
-    render();
-  };
+    // ═══════════════════════════════════════════════════════════════
+    // INITIALIZATION
+    // ═══════════════════════════════════════════════════════════════
 
-  const updateColors = () => {
-    const colorMap = {
-      work: 'work',
-      shortBreak: 'secondary',
-      longBreak: 'accent',
-    };
-    const colorClass = colorMap[currentMode];
-
-    cTimer.className = `compact-timer ${currentMode}`;
-    fTimer.className = `timer-time ${colorClass}`;
-    timerRing.className = `timer-progress-ring ${colorClass}`;
-  };
-
-  const nextSession = () => {
-    if (currentMode === 'work') {
-      timerState.sessionCount++;
-      if (timerState.sessionCount % settings.sessionsBeforeLongBreak === 0) {
-        setMode('longBreak');
-      } else {
-        setMode('shortBreak');
-      }
-    } else {
-      setMode('work');
-    }
-  };
-
-  const startTimer = () => {
-    timerState.isRunning = true;
-    isRunning = true;
-    render();
-  };
-
-  const pauseTimer = () => {
-    timerState.isRunning = false;
-    isRunning = false;
-    render();
-  };
-
-  const resetTimer = () => {
-    timerState.isRunning = false;
-    timerState.timeRemaining = getTotalDuration(timerState.mode);
-    isRunning = false;
-    render();
-  };
-
-  const togglePlay = () => {
-    if (timerState.isRunning) {
-      pauseTimer();
-    } else {
-      startTimer();
-    }
-  };
-
-  // ────────────────────────────────────────────────────────────────
-  // RENDERING
-  // ────────────────────────────────────────────────────────────────
-
-  const render = () => {
-    const timeStr = formatTime(timerState.timeRemaining);
-
-    // Update timers
-    cTimer.textContent = timeStr;
-    fTimer.textContent = timeStr;
-
-    // Update session display
-    fSession.textContent = `Session ${timerState.sessionCount + 1} of ${timerState.totalSessions}`;
-
-    // Update play button
-    const playIcon = fPlay.querySelector('.play-icon');
-    const pauseIcon = fPlay.querySelector('.pause-icon');
-    if (timerState.isRunning) {
-      playIcon.style.display = 'none';
-      pauseIcon.style.display = 'block';
-    } else {
-      playIcon.style.display = 'block';
-      pauseIcon.style.display = 'none';
-    }
-
-    // Update quote
-    cQuote.textContent = `"${currentQuote.text}"`;
-    fQuoteText.textContent = `"${currentQuote.text}"`;
-    fQuoteAuthor.textContent = `— ${currentQuote.author}`;
-
-    // Show/hide quote in full mode (only in work mode)
-    quoteSection.classList.toggle('visible', currentMode === 'work');
-
-    // Update timer ring
-    updateTimerRing();
-  };
-
-  // ────────────────────────────────────────────────────────────────
-  // MODE SWITCHING
-  // ────────────────────────────────────────────────────────────────
-
-  const setCompactMode = () => {
-    isCompactMode = true;
-    compactView.style.display = 'flex';
-    fullView.classList.remove('active');
-    if (window.electron) {
-      window.electron.widgetSetMode('compact');
-    }
-  };
-
-  const setFullMode = () => {
-    isCompactMode = false;
-    compactView.style.display = 'none';
-    fullView.classList.add('active');
-    if (window.electron) {
-      window.electron.widgetSetMode('full');
-    }
-  };
-
-  // ────────────────────────────────────────────────────────────────
-  // EVENTS
-  // ────────────────────────────────────────────────────────────────
-
-  expandBtn.addEventListener('click', setFullMode);
-  collapseBtn.addEventListener('click', setCompactMode);
-  fPlay.addEventListener('click', togglePlay);
-  fReset.addEventListener('click', resetTimer);
-
-  modeWork.addEventListener('click', () => setMode('work'));
-  modeShortBreak.addEventListener('click', () => setMode('shortBreak'));
-  modeLongBreak.addEventListener('click', () => setMode('longBreak'));
-
-  notifBtn.addEventListener('click', async () => {
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        notificationsEnabled = !notificationsEnabled;
-      } else {
-        const permission = await Notification.requestPermission();
-        notificationsEnabled = permission === 'granted';
-      }
-      render();
-    }
-  });
-
-  langEn.addEventListener('click', () => {
-    language = 'en';
-    langEn.classList.add('active');
-    langAr.classList.remove('active');
-    localStorage.setItem('planflow-widget-language', 'en');
-    currentQuote = QUOTES.en[Math.floor(Math.random() * QUOTES.en.length)];
-    render();
-  });
-
-  langAr.addEventListener('click', () => {
-    language = 'ar';
-    langAr.classList.add('active');
-    langEn.classList.remove('active');
-    localStorage.setItem('planflow-widget-language', 'ar');
-    currentQuote = QUOTES.ar[Math.floor(Math.random() * QUOTES.ar.length)];
-    render();
-  });
-
-  // Set initial language
-  if (language === 'ar') {
-    langAr.classList.add('active');
-    langEn.classList.remove('active');
-  }
-
-  // ────────────────────────────────────────────────────────────────
-  // TIMER INTERVAL
-  // ────────────────────────────────────────────────────────────────
-
-  setInterval(() => {
-    updateProgress();
-    render();
-  }, 1000);
-
-  // ────────────────────────────────────────────────────────────────
-  // INITIALIZATION
-  // ────────────────────────────────────────────────────────────────
-
-  updateColors();
-  render();
-</script>
+    updateQuote();
+    updateDisplay();
+    renderTasks();
+  </script>
 </body>
 </html>
