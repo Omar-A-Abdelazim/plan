@@ -1,8 +1,8 @@
 const { BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
-const COMPACT = { width: 300, height: 160 };
-const FULL    = { width: 340, height: 520 };
+const COMPACT = { width: 300, height: 180 };
+const FULL    = { width: 350, height: 500 };
 
 function createWidgetWindow() {
   const { screen } = require('electron');
