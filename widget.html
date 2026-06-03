@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PlanFlow — Pomodoro Widget</title>
+  <title>Pomodoro Widget</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -15,465 +15,405 @@
     }
 
     :root {
-      --bg-primary: #0f0f1a;
-      --bg-secondary: #1a1a2e;
-      --bg-tertiary: #252538;
-      --fg-primary: #e8e8f0;
-      --fg-secondary: #a6a6b8;
-      --fg-muted: #7a7a8e;
-      --accent-primary: #8b5cf6;
-      --accent-secondary: #6366f1;
-      --accent-tertiary: #ec4899;
-      --border-color: rgba(139, 92, 246, 0.2);
-      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
-      --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.3);
+      --bg: #1f1f2e;
+      --bg-secondary: #282839;
+      --fg: #e8e8f0;
+      --fg-muted: #a6a6b8;
+      --border: #3f3f52;
+      --primary: #c39af0;
+      --primary-light: rgba(195, 154, 240, 0.1);
+      --secondary: #7ec8f7;
+      --secondary-light: rgba(126, 200, 247, 0.1);
+      --accent: #fbb96b;
+      --accent-light: rgba(251, 185, 107, 0.1);
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
-      background: var(--bg-primary);
-      color: var(--fg-primary);
-      font-family: 'Geist', -apple-system, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Geist', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
       overflow: hidden;
-      user-select: none;
-      -webkit-font-smoothing: antialiased;
     }
 
     body {
       display: flex;
       flex-direction: column;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-       CONTAINER & LAYOUT
-       ═══════════════════════════════════════════════════════════════ */
-
-    .widget-container {
-      display: flex;
-      width: 100%;
+      padding: clamp(14px, 3%, 20px);
+      gap: clamp(14px, 3%, 20px);
       height: 100%;
-      overflow: hidden;
     }
 
-    .widget-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      background: rgba(26, 26, 46, 0.6);
-      border-bottom: 1px solid var(--border-color);
-      -webkit-app-region: drag;
-      user-select: none;
-    }
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       TIMER SECTION
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-    .widget-header-title {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--fg-secondary);
-    }
-
-    .header-controls {
-      display: flex;
-      gap: 8px;
-      -webkit-app-region: no-drag;
-    }
-
-    .header-btn {
-      width: 24px;
-      height: 24px;
-      border: none;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--fg-secondary);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-
-    .header-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--fg-primary);
-    }
-
-    .header-btn svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-       LEFT PANEL - TIMER & CONTROLS
-       ═══════════════════════════════════════════════════════════════ */
-
-    .left-panel {
-      flex: 1;
+    .timer-section {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 32px 24px;
-      gap: 24px;
-      border-right: 1px solid var(--border-color);
-      overflow-y: auto;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, transparent 100%);
+      gap: clamp(4px, 1%, 8px);
+      flex-shrink: 0;
     }
 
-    .session-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: rgba(139, 92, 246, 0.15);
-      border: 1px solid rgba(139, 92, 246, 0.3);
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      color: #c39af0;
+    .session-mode {
+      font-size: clamp(10px, 1.6vw, 11px);
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
     }
 
     .timer-display {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .timer-value {
-      font-size: clamp(48px, 15vw, 96px);
+      font-size: clamp(48px, 10vw, 68px);
       font-weight: 700;
-      letter-spacing: -3px;
+      letter-spacing: -1.5px;
       font-variant-numeric: tabular-nums;
       line-height: 1;
-      background: linear-gradient(135deg, #8b5cf6, #6366f1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--primary);
+      transition: color 0.3s ease;
     }
 
-    .timer-label {
-      font-size: 13px;
-      color: var(--fg-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .timer-display.short-break {
+      color: var(--secondary);
     }
+
+    .timer-display.long-break {
+      color: var(--accent);
+    }
+
+    .session-info {
+      font-size: clamp(10px, 1.6vw, 11px);
+      color: var(--fg-muted);
+      font-weight: 500;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       CONTROLS
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: clamp(6px, 1.5%, 10px);
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(6px, 1.2%, 8px) clamp(10px, 1.8%, 14px);
+      border: none;
+      border-radius: 6px;
+      background: var(--bg-secondary);
+      color: var(--fg-muted);
+      cursor: pointer;
+      font-size: clamp(11px, 1.8vw, 12px);
+      font-weight: 500;
+      transition: all 0.2s ease;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: var(--border);
+      color: var(--fg);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      color: white;
+      font-weight: 600;
+    }
+
+    .btn.primary:hover {
+      transform: scale(1.04);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       QUOTE SECTION
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
     .quote-section {
-      max-width: 100%;
-      text-align: center;
-      padding: 16px;
-      background: rgba(139, 92, 246, 0.08);
-      border: 1px solid rgba(139, 92, 246, 0.15);
-      border-radius: 12px;
-      animation: fadeIn 0.4s ease-out;
-    }
-
-    .quote-text {
-      font-size: 13px;
-      font-style: italic;
-      color: var(--fg-primary);
-      line-height: 1.6;
-      margin-bottom: 8px;
+      background: var(--primary-light);
+      border: 1px solid rgba(195, 154, 240, 0.2);
+      border-radius: 6px;
+      padding: clamp(8px, 1.5%, 10px);
+      font-size: clamp(10px, 1.6vw, 11px);
+      line-height: 1.5;
+      color: var(--fg);
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      flex-shrink: 0;
     }
 
-    .quote-author {
-      font-size: 11px;
-      color: var(--fg-secondary);
+    .quote-section.short-break {
+      background: var(--secondary-light);
+      border-color: rgba(126, 200, 247, 0.2);
     }
 
-    .controls-group {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
+    .quote-section.long-break {
+      background: var(--accent-light);
+      border-color: rgba(251, 185, 107, 0.2);
     }
 
-    .control-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
-      border: none;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--fg-primary);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 12px;
-      font-weight: 500;
-      -webkit-app-region: no-drag;
-    }
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       TASKS SECTION
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-    .control-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-2px);
-    }
-
-    .control-btn.primary {
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      color: white;
-      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
-    }
-
-    .control-btn.primary:hover {
-      box-shadow: 0 12px 32px rgba(139, 92, 246, 0.45);
-      transform: translateY(-2px) scale(1.05);
-    }
-
-    .control-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
-
-    .control-btn.primary svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-       RIGHT PANEL - TASKS SIDEBAR
-       ═══════════════════════════════════════════════════════════════ */
-
-    .right-panel {
-      width: 240px;
+    .tasks-wrapper {
       display: flex;
       flex-direction: column;
-      background: rgba(26, 26, 46, 0.4);
-      border-left: 1px solid var(--border-color);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      gap: clamp(6px, 1.2%, 8px);
+      flex: 1;
+      min-height: 0;
       overflow: hidden;
-    }
-
-    .right-panel.collapsed {
-      width: 0;
-      border-left: none;
-      padding: 0;
     }
 
     .tasks-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border-color);
-      -webkit-app-region: drag;
-      user-select: none;
-    }
-
-    .tasks-header-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--fg-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .collapse-btn {
-      width: 24px;
-      height: 24px;
-      border: none;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--fg-secondary);
+      gap: 6px;
       cursor: pointer;
+      padding: 4px 0;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .tasks-header:hover {
+      color: var(--primary);
+    }
+
+    .tasks-toggle {
+      width: 16px;
+      height: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
-      -webkit-app-region: no-drag;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
     }
 
-    .collapse-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--fg-primary);
+    .tasks-toggle.expanded {
+      transform: rotate(90deg);
     }
 
-    .collapse-btn svg {
-      width: 16px;
-      height: 16px;
+    .tasks-toggle svg {
+      width: 100%;
+      height: 100%;
       stroke: currentColor;
-      stroke-width: 2;
+      stroke-width: 2.5;
       stroke-linecap: round;
       stroke-linejoin: round;
       fill: none;
-      transition: transform 0.3s ease;
     }
 
-    .tasks-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
+    .tasks-label {
+      font-size: clamp(11px, 1.8vw, 12px);
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    .tasks-container {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: clamp(6px, 1.2%, 8px);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .tasks-container.expanded {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .task-input-group {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .task-input {
+      flex: 1;
+      min-width: 0;
+      padding: clamp(4px, 1%, 6px) clamp(6px, 1.2%, 8px);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg-secondary);
+      color: var(--fg);
+      font-size: clamp(10px, 1.6vw, 11px);
+      transition: all 0.2s ease;
+    }
+
+    .task-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(195, 154, 240, 0.05);
+    }
+
+    .task-input::placeholder {
+      color: var(--fg-muted);
+    }
+
+    .task-add-btn {
+      padding: clamp(4px, 1%, 6px) clamp(8px, 1.2%, 10px);
+      border: none;
+      border-radius: 4px;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-size: clamp(10px, 1.6vw, 11px);
+      font-weight: 600;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .task-add-btn:hover {
+      background: rgba(195, 154, 240, 0.9);
+      transform: scale(1.02);
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(4px, 1%, 6px);
+      overflow-y: auto;
     }
 
     .task-item {
       display: flex;
       align-items: flex-start;
-      gap: 8px;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 8px;
+      gap: 6px;
+      padding: clamp(4px, 1%, 6px);
+      border-radius: 4px;
+      background: var(--bg-secondary);
       transition: all 0.2s ease;
-      animation: slideIn 0.3s ease-out;
     }
 
     .task-item:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.12);
-    }
-
-    .task-item.completed {
-      opacity: 0.6;
-    }
-
-    .task-item.completed .task-text {
-      text-decoration: line-through;
-      color: var(--fg-muted);
+      background: var(--border);
     }
 
     .task-checkbox {
       width: 16px;
       height: 16px;
       min-width: 16px;
-      margin-top: 2px;
+      margin-top: 1px;
       cursor: pointer;
-      accent-color: var(--accent-primary);
+      accent-color: var(--primary);
     }
 
     .task-text {
       flex: 1;
-      font-size: 12px;
-      line-height: 1.5;
+      min-width: 0;
+      font-size: clamp(10px, 1.6vw, 11px);
+      color: var(--fg);
       word-break: break-word;
-      color: var(--fg-primary);
       transition: all 0.2s ease;
     }
 
+    .task-item.completed .task-text {
+      color: var(--fg-muted);
+      text-decoration: line-through;
+    }
+
     .task-delete {
-      width: 18px;
-      height: 18px;
-      min-width: 18px;
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border: none;
       background: transparent;
       color: var(--fg-muted);
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
+      padding: 1px;
+      border-radius: 3px;
       transition: all 0.2s ease;
-      -webkit-app-region: no-drag;
-    }
-
-    .task-item:hover .task-delete {
-      opacity: 1;
-      color: #ec4899;
+      flex-shrink: 0;
     }
 
     .task-delete:hover {
-      transform: scale(1.1);
+      background: rgba(255, 0, 0, 0.15);
+      color: #ff6b6b;
     }
 
     .task-delete svg {
-      width: 14px;
-      height: 14px;
+      width: 100%;
+      height: 100%;
       stroke: currentColor;
-      stroke-width: 2;
+      stroke-width: 2.5;
       stroke-linecap: round;
       stroke-linejoin: round;
       fill: none;
     }
 
-    .tasks-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: var(--fg-muted);
-      font-size: 12px;
+    .empty-tasks {
       text-align: center;
-      padding: 20px;
-    }
-
-    .add-task-input {
-      padding: 10px 12px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 6px;
-      color: var(--fg-primary);
-      font-size: 12px;
-      font-family: inherit;
-      outline: none;
-      transition: all 0.2s ease;
-      margin: 8px 12px 12px;
-    }
-
-    .add-task-input:focus {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
-    }
-
-    .add-task-input::placeholder {
+      padding: clamp(8px, 1.5%, 10px);
       color: var(--fg-muted);
+      font-size: clamp(10px, 1.6vw, 11px);
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       ANIMATIONS
-       ═══════════════════════════════════════════════════════════════ */
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       FOOTER
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(4px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .footer {
+      display: flex;
+      justify-content: center;
+      gap: clamp(6px, 1.2%, 8px);
+      flex-wrap: wrap;
+      flex-shrink: 0;
+      padding-top: clamp(6px, 1.2%, 8px);
+      border-top: 1px solid var(--border);
     }
 
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateX(-8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
+    .language-toggle {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
     }
 
-    /* ═══════════════════════════════════════════════════════════════
+    .lang-btn {
+      padding: clamp(3px, 0.8%, 4px) clamp(6px, 1.2%, 8px);
+      border: none;
+      background: transparent;
+      color: var(--fg-muted);
+      cursor: pointer;
+      font-size: clamp(9px, 1.4vw, 10px);
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .lang-btn.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .lang-btn:hover:not(.active) {
+      background: var(--bg-secondary);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        SCROLLBAR
-       ═══════════════════════════════════════════════════════════════ */
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
     ::-webkit-scrollbar {
-      width: 6px;
+      width: 5px;
     }
 
     ::-webkit-scrollbar-track {
@@ -481,140 +421,135 @@
     }
 
     ::-webkit-scrollbar-thumb {
-      background: rgba(139, 92, 246, 0.3);
-      border-radius: 3px;
+      background: rgba(195, 154, 240, 0.3);
+      border-radius: 2px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(139, 92, 246, 0.5);
+      background: rgba(195, 154, 240, 0.5);
     }
   </style>
 </head>
 <body>
-  <div class="widget-container">
-    <!-- HEADER -->
-    <div class="widget-header">
-      <div class="widget-header-title">PlanFlow Pomodoro</div>
-      <div class="header-controls">
-        <button class="header-btn" id="settingsBtn" title="Settings">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-        </button>
-        <button class="header-btn" id="closeBtn" title="Close">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+  <!-- Timer -->
+  <div class="timer-section">
+    <div class="session-mode" id="sessionMode">Focus Session</div>
+    <div class="timer-display" id="timerDisplay">25:00</div>
+    <div class="session-info" id="sessionInfo">Session 1 of 4</div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn primary" id="playBtn">Start</button>
+    <button class="btn" id="pauseBtn" style="display: none;">Pause</button>
+    <button class="btn" id="resetBtn">Reset</button>
+  </div>
+
+  <!-- Quote -->
+  <div class="quote-section" id="quoteSection">"The secret of getting ahead is getting started."</div>
+
+  <!-- Tasks -->
+  <div class="tasks-wrapper">
+    <div class="tasks-header" id="tasksHeader">
+      <div class="tasks-toggle" id="tasksToggle">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
       </div>
+      <div class="tasks-label">Tasks</div>
     </div>
 
-    <!-- LEFT PANEL -->
-    <div class="left-panel">
-      <div class="session-badge">
-        <span id="sessionMode">Focus Session</span>
-        <span id="sessionCount">1/4</span>
+    <div class="tasks-container" id="tasksContainer">
+      <div class="task-input-group">
+        <input type="text" class="task-input" id="taskInput" placeholder="Add task..." autocomplete="off" />
+        <button class="task-add-btn" id="addTaskBtn">Add</button>
       </div>
 
-      <div class="timer-display">
-        <div class="timer-value" id="timerDisplay">25:00</div>
-        <div class="timer-label">Remaining</div>
-      </div>
-
-      <div class="quote-section">
-        <div class="quote-text" id="quoteText">"The only way to do great work is to love what you do."</div>
-        <div class="quote-author" id="quoteAuthor">— Steve Jobs</div>
-      </div>
-
-      <div class="controls-group">
-        <button class="control-btn primary" id="playBtn" title="Start/Pause">
-          <svg viewBox="0 0 24 24" class="play-icon">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-          <svg viewBox="0 0 24 24" class="pause-icon" style="display: none;">
-            <rect x="6" y="4" width="4" height="16"/>
-            <rect x="14" y="4" width="4" height="16"/>
-          </svg>
-        </button>
-        <button class="control-btn" id="resetBtn" title="Reset">
-          <svg viewBox="0 0 24 24">
-            <path d="M1 4v6h6M23 20v-6h-6"/>
-            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- RIGHT PANEL -->
-    <div class="right-panel" id="tasksPanel">
-      <div class="tasks-header">
-        <div class="tasks-header-title">Tasks</div>
-        <button class="collapse-btn" id="toggleTasksBtn" title="Collapse">
-          <svg viewBox="0 0 24 24">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-        </button>
-      </div>
-
-      <input type="text" class="add-task-input" id="addTaskInput" placeholder="Add new task..." />
-
-      <div class="tasks-content" id="tasksList">
-        <div class="tasks-empty">No tasks yet. Add one to get started!</div>
+      <div class="task-list" id="taskList">
+        <div class="empty-tasks">No tasks yet</div>
       </div>
     </div>
   </div>
 
+  <!-- Footer -->
+  <div class="footer">
+    <div class="language-toggle">
+      <button class="lang-btn active" id="langEn">EN</button>
+      <button class="lang-btn" id="langAr">AR</button>
+    </div>
+  </div>
+
   <script>
-    // ═══════════════════════════════════════════════════════════════
-    // STATE & QUOTES
-    // ═══════════════════════════════════════════════════════════════
+    // ────────────────────────────────────────────────────────────────
+    // QUOTES
+    // ────────────────────────────────────────────────────────────────
 
-    const QUOTES = [
-      { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-      { text: "Focus is the gateway to success.", author: "Brian Tracy" },
-      { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
-      { text: "Success is not final, failure is not fatal.", author: "Winston Churchill" },
-      { text: "The future depends on what you do today.", author: "Mahatma Gandhi" },
-      { text: "Excellence is not a destination; it is a continuous journey.", author: "Brian Tracy" },
-      { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
-      { text: "You are what you do, not what you say you'll do.", author: "C.G. Jung" },
-    ];
+    const QUOTES = {
+      en: [
+        "The secret of getting ahead is getting started.",
+        "Don't watch the clock; do what it does. Keep going.",
+        "The only way to do great work is to love what you do.",
+        "Focus is the gateway to success.",
+        "You don't have to be great to start, but you have to start to be great.",
+        "Success is not final, failure is not fatal.",
+        "The future depends on what you do today.",
+        "Excellence is not a destination; it is a continuous journey.",
+        "Start where you are. Use what you have. Do what you can.",
+      ],
+      ar: [
+        "سر التقدم هو البدء.",
+        "التركيز هو بوابة النجاح.",
+        "العِلمُ نُورٌ وَالجَهلُ ظَلامٌ",
+        "الصَّبرُ مِفتاحُ الفَرَج",
+        "من جَدَّ وَجَد، وَمَن زَرَعَ حَصَد",
+      ],
+    };
 
-    let timerState = {
+    // ────────────────────────────────────────────────────────────────
+    // STATE
+    // ────────────────────────────────────────────────────────────────
+
+    let state = {
       mode: 'work',
       timeRemaining: 25 * 60,
-      sessionCount: 1,
-      totalSessions: 4,
       isRunning: false,
+      sessionCount: 0,
+      totalSessions: 4,
+      language: localStorage.getItem('pomodoro-language') || 'en',
+      tasks: JSON.parse(localStorage.getItem('pomodoro-tasks')) || [],
+      tasksExpanded: false,
     };
 
-    let settings = {
-      workDuration: 25 * 60,
-      shortBreakDuration: 5 * 60,
-      longBreakDuration: 15 * 60,
+    const config = {
+      work: { duration: 25 * 60, label: 'Focus Session', className: '' },
+      shortBreak: { duration: 5 * 60, label: 'Short Break', className: 'short-break' },
+      longBreak: { duration: 15 * 60, label: 'Long Break', className: 'long-break' },
     };
 
-    let tasks = JSON.parse(localStorage.getItem('planflow-tasks') || '[]');
-    let currentQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    let currentQuote = QUOTES[state.language][0];
     let timerInterval = null;
 
-    // ═══════════════════════════════════════════════════════════════
+    // ────────────────────────────────────────────────────────────────
     // DOM REFERENCES
-    // ═══════════════════════════════════════════════════════════════
+    // ────────────────────────────────────────────────────────────────
 
-    const timerDisplay = document.getElementById('timerDisplay');
     const sessionMode = document.getElementById('sessionMode');
-    const sessionCount = document.getElementById('sessionCount');
-    const quoteText = document.getElementById('quoteText');
-    const quoteAuthor = document.getElementById('quoteAuthor');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const sessionInfo = document.getElementById('sessionInfo');
     const playBtn = document.getElementById('playBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
     const resetBtn = document.getElementById('resetBtn');
-    const closeBtn = document.getElementById('closeBtn');
-    const tasksPanel = document.getElementById('tasksPanel');
-    const toggleTasksBtn = document.getElementById('toggleTasksBtn');
-    const tasksList = document.getElementById('tasksList');
-    const addTaskInput = document.getElementById('addTaskInput');
-    const settingsBtn = document.getElementById('settingsBtn');
+    const quoteSection = document.getElementById('quoteSection');
+    const tasksHeader = document.getElementById('tasksHeader');
+    const tasksToggle = document.getElementById('tasksToggle');
+    const tasksContainer = document.getElementById('tasksContainer');
+    const taskInput = document.getElementById('taskInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskList = document.getElementById('taskList');
+    const langEn = document.getElementById('langEn');
+    const langAr = document.getElementById('langAr');
 
-    // ═══════════════════════════════════════════════════════════════
-    // TIMER LOGIC
-    // ═══════════════════════════════════════════════════════════════
+    // ────────────────────────────────────────────────────────────────
+    // HELPERS
+    // ────────────────────────────────────────────────────────────────
 
     const formatTime = (seconds) => {
       const mins = Math.floor(seconds / 60);
@@ -622,169 +557,173 @@
       return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
-    const updateDisplay = () => {
-      timerDisplay.textContent = formatTime(timerState.timeRemaining);
-      sessionCount.textContent = `${timerState.sessionCount}/${timerState.totalSessions}`;
-      
-      const modes = { work: 'Focus Session', shortBreak: 'Short Break', longBreak: 'Long Break' };
-      sessionMode.textContent = modes[timerState.mode];
-
-      const playIcon = playBtn.querySelector('.play-icon');
-      const pauseIcon = playBtn.querySelector('.pause-icon');
-      if (timerState.isRunning) {
-        playIcon.style.display = 'none';
-        pauseIcon.style.display = 'block';
-      } else {
-        playIcon.style.display = 'block';
-        pauseIcon.style.display = 'none';
-      }
+    const getRandomQuote = () => {
+      const pool = QUOTES[state.language];
+      return pool[Math.floor(Math.random() * pool.length)];
     };
 
-    const tick = () => {
-      if (timerState.timeRemaining > 0) {
-        timerState.timeRemaining--;
-        updateDisplay();
-      } else {
-        timerState.isRunning = false;
-        nextSession();
-      }
+    // ────────────────────────────────────────────────────────────────
+    // TIMER
+    // ────────────────────────────────────────────────────────────────
+
+    const startTimer = () => {
+      if (state.isRunning) return;
+      state.isRunning = true;
+      timerInterval = setInterval(() => {
+        if (state.timeRemaining > 0) {
+          state.timeRemaining--;
+          render();
+        } else {
+          clearInterval(timerInterval);
+          nextSession();
+        }
+      }, 1000);
+      render();
     };
 
-    const togglePlay = () => {
-      if (timerState.isRunning) {
-        timerState.isRunning = false;
-        if (timerInterval) clearInterval(timerInterval);
-      } else {
-        timerState.isRunning = true;
-        timerInterval = setInterval(tick, 1000);
-      }
-      updateDisplay();
+    const pauseTimer = () => {
+      state.isRunning = false;
+      if (timerInterval) clearInterval(timerInterval);
+      render();
     };
 
     const resetTimer = () => {
-      timerState.isRunning = false;
+      state.isRunning = false;
       if (timerInterval) clearInterval(timerInterval);
-      timerState.mode = 'work';
-      timerState.sessionCount = 1;
-      timerState.timeRemaining = settings.workDuration;
-      updateDisplay();
+      state.mode = 'work';
+      state.timeRemaining = config.work.duration;
+      state.sessionCount = 0;
+      currentQuote = getRandomQuote();
+      render();
     };
 
     const nextSession = () => {
-      if (timerState.mode === 'work') {
-        timerState.sessionCount++;
-        if (timerState.sessionCount % timerState.totalSessions === 0) {
-          timerState.mode = 'longBreak';
-          timerState.timeRemaining = settings.longBreakDuration;
-        } else {
-          timerState.mode = 'shortBreak';
-          timerState.timeRemaining = settings.shortBreakDuration;
-        }
+      if (state.mode === 'work') {
+        state.sessionCount++;
+        state.mode = state.sessionCount % state.totalSessions === 0 ? 'longBreak' : 'shortBreak';
       } else {
-        timerState.mode = 'work';
-        timerState.timeRemaining = settings.workDuration;
+        state.mode = 'work';
       }
-      currentQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-      updateQuote();
-      updateDisplay();
+      state.timeRemaining = config[state.mode].duration;
+      currentQuote = getRandomQuote();
+      render();
     };
 
-    // ═══════════════════════════════════════════════════════════════
-    // QUOTE MANAGEMENT
-    // ═══════════════════════════════════════════════════════════════
-
-    const updateQuote = () => {
-      quoteText.textContent = `"${currentQuote.text}"`;
-      quoteAuthor.textContent = `— ${currentQuote.author}`;
-    };
-
-    // ═══════════════════════════════════════════════════════════════
-    // TASKS MANAGEMENT
-    // ═══════════════════════════════════════════════════════════════
+    // ────────────────────────────────────────────────────────────────
+    // TASKS
+    // ────────────────────────────────────────────────────────────────
 
     const saveTasks = () => {
-      localStorage.setItem('planflow-tasks', JSON.stringify(tasks));
+      localStorage.setItem('pomodoro-tasks', JSON.stringify(state.tasks));
     };
 
-    const renderTasks = () => {
-      if (tasks.length === 0) {
-        tasksList.innerHTML = '<div class="tasks-empty">No tasks yet. Add one to get started!</div>';
-        return;
-      }
-
-      tasksList.innerHTML = tasks.map(task => `
-        <div class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
-          <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} />
-          <div class="task-text">${task.text}</div>
-          <button class="task-delete" title="Delete">
-            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-          </button>
-        </div>
-      `).join('');
-
-      // Attach event listeners
-      tasksList.querySelectorAll('.task-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', (e) => {
-          const id = e.target.closest('.task-item').getAttribute('data-id');
-          const task = tasks.find(t => t.id === id);
-          if (task) {
-            task.completed = e.target.checked;
-            saveTasks();
-            renderTasks();
-          }
-        });
-      });
-
-      tasksList.querySelectorAll('.task-delete').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const id = e.target.closest('.task-item').getAttribute('data-id');
-          tasks = tasks.filter(t => t.id !== id);
-          saveTasks();
-          renderTasks();
-        });
-      });
-    };
-
-    const addTask = (text) => {
-      if (!text.trim()) return;
-      tasks.push({
-        id: Date.now().toString(),
-        text: text.trim(),
-        completed: false,
-      });
+    const addTask = () => {
+      const text = taskInput.value.trim();
+      if (!text) return;
+      state.tasks.push({ id: Date.now(), text, completed: false });
+      taskInput.value = '';
       saveTasks();
-      renderTasks();
-      addTaskInput.value = '';
-      addTaskInput.focus();
+      render();
     };
 
-    // ═══════════════════════════════════════════════════════════════
-    // UI INTERACTIONS
-    // ═══════════════════════════════════════════════════════════════
+    const toggleTask = (id) => {
+      const task = state.tasks.find((t) => t.id === id);
+      if (task) task.completed = !task.completed;
+      saveTasks();
+      render();
+    };
 
-    playBtn.addEventListener('click', togglePlay);
-    resetBtn.addEventListener('click', resetTimer);
-    closeBtn.addEventListener('click', () => {
-      if (window.electron) window.electron.closeWidget();
-    });
+    const deleteTask = (id) => {
+      state.tasks = state.tasks.filter((t) => t.id !== id);
+      saveTasks();
+      render();
+    };
 
-    toggleTasksBtn.addEventListener('click', () => {
-      tasksPanel.classList.toggle('collapsed');
-    });
+    // ────────────────────────────────────────────────────────────────
+    // RENDERING
+    // ────────────────────────────────────────────────────────────────
 
-    addTaskInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        addTask(addTaskInput.value);
+    const render = () => {
+      const cfg = config[state.mode];
+
+      // Timer
+      sessionMode.textContent = cfg.label;
+      timerDisplay.textContent = formatTime(state.timeRemaining);
+      timerDisplay.className = `timer-display ${cfg.className}`;
+      sessionInfo.textContent = `Session ${state.sessionCount + 1} of ${state.totalSessions}`;
+
+      // Controls
+      playBtn.style.display = state.isRunning ? 'none' : 'block';
+      pauseBtn.style.display = state.isRunning ? 'block' : 'none';
+
+      // Quote
+      quoteSection.textContent = `"${currentQuote}"`;
+      quoteSection.className = `quote-section ${cfg.className}`;
+
+      // Tasks
+      taskList.innerHTML = '';
+      if (state.tasks.length === 0) {
+        taskList.innerHTML = '<div class="empty-tasks">No tasks yet</div>';
+      } else {
+        state.tasks.forEach((task) => {
+          const taskEl = document.createElement('div');
+          taskEl.className = `task-item ${task.completed ? 'completed' : ''}`;
+          taskEl.innerHTML = `
+            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} />
+            <div class="task-text">${task.text}</div>
+            <button class="task-delete" title="Delete">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          `;
+          taskEl.querySelector('.task-checkbox').addEventListener('change', () => toggleTask(task.id));
+          taskEl.querySelector('.task-delete').addEventListener('click', () => deleteTask(task.id));
+          taskList.appendChild(taskEl);
+        });
       }
+
+      // Language
+      langEn.classList.toggle('active', state.language === 'en');
+      langAr.classList.toggle('active', state.language === 'ar');
+    };
+
+    // ────────────────────────────────────────────────────────────────
+    // EVENTS
+    // ────────────────────────────────────────────────────────────────
+
+    playBtn.addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', resetTimer);
+
+    tasksHeader.addEventListener('click', () => {
+      state.tasksExpanded = !state.tasksExpanded;
+      tasksToggle.classList.toggle('expanded', state.tasksExpanded);
+      tasksContainer.classList.toggle('expanded', state.tasksExpanded);
     });
 
-    // ═══════════════════════════════════════════════════════════════
-    // INITIALIZATION
-    // ═══════════════════════════════════════════════════════════════
+    addTaskBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') addTask();
+    });
 
-    updateQuote();
-    updateDisplay();
-    renderTasks();
+    langEn.addEventListener('click', () => {
+      state.language = 'en';
+      localStorage.setItem('pomodoro-language', 'en');
+      currentQuote = getRandomQuote();
+      render();
+    });
+
+    langAr.addEventListener('click', () => {
+      state.language = 'ar';
+      localStorage.setItem('pomodoro-language', 'ar');
+      currentQuote = getRandomQuote();
+      render();
+    });
+
+    // ────────────────────────────────────────────────────────────────
+    // INIT
+    // ────────────────────────────────────────────────────────────────
+
+    render();
   </script>
 </body>
 </html>

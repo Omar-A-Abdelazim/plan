@@ -6,17 +6,19 @@ function createWidgetWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
   const widgetWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    x: width - 820,
-    y: height - 620,
+    width: 360,
+    height: 500,
+    x: width - 360 - 20,
+    y: height - 500 - 20,
     frame: false,
     alwaysOnTop: true,
     resizable: true,
-    minWidth: 500,
-    minHeight: 300,
+    minWidth: 320,
+    minHeight: 450,
+    maxWidth: 500,
+    maxHeight: 700,
     transparent: false,
-    backgroundColor: '#0f0f1a',
+    backgroundColor: '#1f1f2e',
     show: false,
     hasShadow: true,
     webPreferences: {
@@ -35,22 +37,6 @@ function createWidgetWindow() {
     widgetWindow.focus();
   });
 
-  // IPC: Add task
-  ipcMain.on('widget-add-task', (event, taskText) => {
-    widgetWindow.webContents.send('task-added', taskText);
-  });
-
-  // IPC: Toggle task
-  ipcMain.on('widget-toggle-task', (event, taskId) => {
-    widgetWindow.webContents.send('task-toggled', taskId);
-  });
-
-  // IPC: Delete task
-  ipcMain.on('widget-delete-task', (event, taskId) => {
-    widgetWindow.webContents.send('task-deleted', taskId);
-  });
-
-  // IPC: Close widget
   ipcMain.on('widget-close', () => widgetWindow.hide());
 
   widgetWindow.webContents.on('will-navigate', (event, url) => {
