@@ -28,8 +28,7 @@
       --accent-light: rgba(251, 185, 107, 0.1);
     }
 
-    html,
-    body {
+    html, body {
       width: 100%;
       height: 100%;
       background: var(--bg);
@@ -43,11 +42,54 @@
     body {
       display: flex;
       flex-direction: column;
-      padding: clamp(14px, 3%, 20px);
-      gap: clamp(14px, 3%, 20px);
+      padding: clamp(12px, 3%, 16px);
+      gap: clamp(12px, 2%, 14px);
       height: 100%;
       -webkit-user-select: none;
       user-select: none;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       HEADER (DRAGGABLE)
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      -webkit-app-region: drag;
+      cursor: move;
+    }
+
+    .title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .close-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--fg-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-app-region: no-drag;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--fg);
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -58,13 +100,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: clamp(4px, 1%, 8px);
+      gap: 6px;
       flex-shrink: 0;
-      -webkit-app-region: drag;
     }
 
     .session-mode {
-      font-size: clamp(10px, 1.6vw, 11px);
+      font-size: 11px;
       color: var(--fg-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -72,7 +113,7 @@
     }
 
     .timer-display {
-      font-size: clamp(48px, 10vw, 68px);
+      font-size: 48px;
       font-weight: 700;
       letter-spacing: -1.5px;
       font-variant-numeric: tabular-nums;
@@ -90,7 +131,7 @@
     }
 
     .session-info {
-      font-size: clamp(10px, 1.6vw, 11px);
+      font-size: 11px;
       color: var(--fg-muted);
       font-weight: 500;
     }
@@ -102,42 +143,23 @@
     .controls {
       display: flex;
       justify-content: center;
-      gap: clamp(8px, 2%, 12px);
+      gap: 8px;
       flex-wrap: wrap;
       flex-shrink: 0;
       -webkit-app-region: no-drag;
     }
 
     .btn {
-      padding: clamp(6px, 1.2%, 8px) clamp(12px, 2.5%, 18px);
+      padding: 6px 12px;
       background: transparent;
       border: 1px solid var(--border);
       color: var(--fg-muted);
       border-radius: 6px;
       cursor: pointer;
-      font-size: clamp(12px, 1.8vw, 13px);
+      font-size: 12px;
       font-weight: 500;
       transition: all 0.2s ease;
       -webkit-app-region: no-drag;
-    }
-
-    .btn:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--fg);
-      border-color: rgba(255, 255, 255, 0.15);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn.primary {
-      background: linear-gradient(135deg, var(--primary), #7b5ed1);
-      color: white;
-      border: none;
-    }
-
-    .btn.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(195, 154, 240, 0.4);
     }
 
     .btn:hover {
@@ -149,11 +171,16 @@
       background: linear-gradient(135deg, #8b5cf6, #3b82f6);
       color: white;
       font-weight: 600;
+      border: none;
     }
 
     .btn.primary:hover {
-      transform: scale(1.04);
+      transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -164,16 +191,12 @@
       background: var(--primary-light);
       border: 1px solid rgba(195, 154, 240, 0.2);
       border-radius: 6px;
-      padding: clamp(8px, 1.5%, 10px);
-      font-size: clamp(10px, 1.6vw, 11px);
-      line-height: 1.5;
+      padding: 8px;
+      font-size: 11px;
+      line-height: 1.4;
       color: var(--fg);
       display: -webkit-box;
       -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      -webkit-app-region: drag;
-    }
       -webkit-box-orient: vertical;
       overflow: hidden;
       flex-shrink: 0;
@@ -196,7 +219,7 @@
     .tasks-wrapper {
       display: flex;
       flex-direction: column;
-      gap: clamp(6px, 1.2%, 8px);
+      gap: 6px;
       flex: 1;
       min-height: 0;
       overflow: hidden;
@@ -210,6 +233,7 @@
       padding: 4px 0;
       transition: all 0.2s ease;
       flex-shrink: 0;
+      -webkit-app-region: no-drag;
     }
 
     .tasks-header:hover {
@@ -241,7 +265,7 @@
     }
 
     .tasks-label {
-      font-size: clamp(11px, 1.8vw, 12px);
+      font-size: 12px;
       font-weight: 600;
       color: var(--fg);
     }
@@ -249,48 +273,36 @@
     .tasks-container {
       display: flex;
       flex-direction: column;
-      gap: clamp(6px, 1.2%, 8px);
+      gap: 6px;
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .tasks-container.expanded {
-      max-height: clamp(200px, 60vh, 400px);
+      max-height: 200px;
       overflow-y: auto;
     }
 
     .task-input-group {
       display: flex;
-      gap: 8px;
-      margin-top: 10px;
-      -webkit-app-region: no-drag;
-    }
-
-    .task-input {
-      flex: 1;
-      padding: clamp(6px, 1%, 8px) clamp(8px, 1.5%, 12px);
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--fg);
-      font-family: inherit;
-      font-size: clamp(12px, 1.8vw, 14px);
-      outline: none;
-      transition: border-color 0.2s ease;
+      gap: 6px;
       -webkit-app-region: no-drag;
     }
 
     .task-input {
       flex: 1;
       min-width: 0;
-      padding: clamp(4px, 1%, 6px) clamp(6px, 1.2%, 8px);
+      padding: 6px 8px;
       border: 1px solid var(--border);
       border-radius: 4px;
       background: var(--bg-secondary);
       color: var(--fg);
-      font-size: clamp(10px, 1.6vw, 11px);
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
       transition: all 0.2s ease;
+      -webkit-app-region: no-drag;
     }
 
     .task-input:focus {
@@ -304,33 +316,27 @@
     }
 
     .task-add-btn {
-      padding: clamp(6px, 1.2%, 8px) clamp(12px, 2.5%, 16px);
+      padding: 6px 12px;
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: clamp(12px, 1.8vw, 13px);
+      font-size: 12px;
       font-weight: 600;
       transition: all 0.2s ease;
       -webkit-app-region: no-drag;
     }
 
     .task-add-btn:hover {
-      background: #b58ae0;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(195, 154, 240, 0.4);
-    }
-
-    .task-add-btn:hover {
       background: rgba(195, 154, 240, 0.9);
-      transform: scale(1.02);
+      transform: translateY(-1px);
     }
 
     .task-list {
       display: flex;
       flex-direction: column;
-      gap: clamp(4px, 1%, 6px);
+      gap: 4px;
       overflow-y: auto;
     }
 
@@ -338,10 +344,11 @@
       display: flex;
       align-items: flex-start;
       gap: 6px;
-      padding: clamp(4px, 1%, 6px);
+      padding: 6px;
       border-radius: 4px;
       background: var(--bg-secondary);
       transition: all 0.2s ease;
+      -webkit-app-region: no-drag;
     }
 
     .task-item:hover {
@@ -361,7 +368,7 @@
     .task-text {
       flex: 1;
       min-width: 0;
-      font-size: clamp(10px, 1.6vw, 11px);
+      font-size: 11px;
       color: var(--fg);
       word-break: break-word;
       transition: all 0.2s ease;
@@ -383,11 +390,13 @@
       background: transparent;
       color: var(--fg-muted);
       cursor: pointer;
-      padding: 1px;
-      border-radius: 3px;
+      padding: 0;
+      border-radius: 2px;
       transition: all 0.2s ease;
       flex-shrink: 0;
       -webkit-app-region: no-drag;
+      font-size: 14px;
+      line-height: 1;
     }
 
     .task-delete:hover {
@@ -395,21 +404,11 @@
       color: #ff6b6b;
     }
 
-    .task-delete svg {
-      width: 100%;
-      height: 100%;
-      stroke: currentColor;
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
-
     .empty-tasks {
       text-align: center;
-      padding: clamp(8px, 1.5%, 10px);
+      padding: 8px;
       color: var(--fg-muted);
-      font-size: clamp(10px, 1.6vw, 11px);
+      font-size: 11px;
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -419,10 +418,10 @@
     .footer {
       display: flex;
       justify-content: center;
-      gap: clamp(6px, 1.2%, 8px);
+      gap: 6px;
       flex-wrap: wrap;
       flex-shrink: 0;
-      padding-top: clamp(6px, 1.2%, 8px);
+      padding-top: 8px;
       border-top: 1px solid var(--border);
     }
 
@@ -434,13 +433,13 @@
     }
 
     .lang-btn {
-      padding: clamp(4px, 1%, 6px) clamp(10px, 2%, 14px);
+      padding: 4px 10px;
       background: transparent;
       border: 1px solid var(--border);
       color: var(--fg-muted);
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: clamp(10px, 1.6vw, 11px);
+      font-size: 11px;
       font-weight: 600;
       transition: all 0.2s ease;
       -webkit-app-region: no-drag;
@@ -454,98 +453,6 @@
 
     .lang-btn:hover:not(.active) {
       background: var(--bg-secondary);
-    }
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-       ANIMATIONS
-       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-    @keyframes slideInUp {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.7;
-      }
-    }
-
-    @keyframes timerTick {
-      0% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.01);
-      }
-      100% {
-        transform: scale(1);
-      }
-    }
-
-    .timer-section {
-      animation: slideInDown 0.4s ease-out;
-    }
-
-    .controls {
-      animation: slideInUp 0.4s ease-out 0.1s both;
-    }
-
-    .quote-section {
-      animation: fadeIn 0.3s ease-out 0.2s both;
-    }
-
-    .tasks-wrapper {
-      animation: slideInUp 0.4s ease-out 0.3s both;
-    }
-
-    .timer-display {
-      animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) 3s infinite;
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    .task-add-btn:active {
-      transform: scale(0.97);
-    }
-
-    .task-item {
-      animation: slideInUp 0.2s ease-out;
-    }
-
-    .task-item:hover {
-      animation: none;
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -571,6 +478,12 @@
   </style>
 </head>
 <body>
+  <!-- Header -->
+  <div class="header">
+    <div class="title">Pomodoro</div>
+    <button class="close-btn" id="closeBtn">×</button>
+  </div>
+
   <!-- Timer -->
   <div class="timer-section">
     <div class="session-mode" id="sessionMode">Focus Session</div>
@@ -618,9 +531,9 @@
   </div>
 
   <script>
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
     // QUOTES
-    // ─────────���─────────────────────────────────�����────────────────────
+    // ─────────────────────────────────────────────────────────────
 
     const QUOTES = {
       en: [
@@ -638,24 +551,32 @@
         "سر التقدم هو البدء.",
         "التركيز هو بوابة النجاح.",
         "العِلمُ نُورٌ وَالجَهلُ ظَلامٌ",
-        "ال��َّبرُ مِفتاحُ الفَرَج",
+        "الصَّبرُ مِفتاحُ الفَرَج",
         "من جَدَّ وَجَد، وَمَن زَرَعَ حَصَد",
       ],
     };
 
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
     // STATE
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
 
-    let state = {
-      mode: 'work',
-      timeRemaining: 25 * 60,
-      isRunning: false,
-      sessionCount: 0,
-      totalSessions: 4,
+    let widgetState = {
+      timerState: {
+        mode: 'work',
+        timeRemaining: 25 * 60,
+        isRunning: false,
+        sessionCount: 0,
+        totalSessions: 4,
+      },
+      settings: {
+        workDuration: 25,
+        shortBreakDuration: 5,
+        longBreakDuration: 15,
+        sessionsBeforeLongBreak: 4,
+      },
+      currentQuote: null,
+      tasks: [],
       language: localStorage.getItem('pomodoro-language') || 'en',
-      tasks: JSON.parse(localStorage.getItem('pomodoro-tasks')) || [],
-      tasksExpanded: false,
     };
 
     const config = {
@@ -664,32 +585,20 @@
       longBreak: { duration: 15 * 60, label: 'Long Break', className: 'long-break' },
     };
 
-    let currentQuote = QUOTES[state.language][0];
+    let currentQuote = QUOTES[widgetState.language][0];
     let timerInterval = null;
 
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
     // DOM REFERENCES
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
 
+    const closeBtn = document.getElementById('closeBtn');
     const sessionMode = document.getElementById('sessionMode');
     const timerDisplay = document.getElementById('timerDisplay');
     const sessionInfo = document.getElementById('sessionInfo');
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const resetBtn = document.getElementById('resetBtn');
-    const quoteSection = document.getElementById('quoteSection');
-    const tasksContainer = document.getElementById('tasksContainer');
-    const taskList = document.getElementById('taskList');
-    const taskInput = document.getElementById('taskInput');
-    const addTaskBtn = document.getElementById('addTaskBtn');
-    const langEn = document.getElementById('langEn');
-    const langAr = document.getElementById('langAr');
-
-    // ────────────────────────────────────────────────────────────────
-    // IPC LISTENERS
-    // ────────────────────────────────────────────────────────────────
-    // Note: Widget runs independently - no state sync with main app
-
     const quoteSection = document.getElementById('quoteSection');
     const tasksHeader = document.getElementById('tasksHeader');
     const tasksToggle = document.getElementById('tasksToggle');
@@ -700,9 +609,9 @@
     const langEn = document.getElementById('langEn');
     const langAr = document.getElementById('langAr');
 
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
     // HELPERS
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
 
     const formatTime = (seconds) => {
       const mins = Math.floor(seconds / 60);
@@ -711,20 +620,20 @@
     };
 
     const getRandomQuote = () => {
-      const pool = QUOTES[state.language];
+      const pool = QUOTES[widgetState.language];
       return pool[Math.floor(Math.random() * pool.length)];
     };
 
-    // ────────────────────────────────────────────────────────────────
-    // TIMER
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // TIMER FUNCTIONS
+    // ─────────────────────────────────────────────────────────────
 
     const startTimer = () => {
-      if (state.isRunning) return;
-      state.isRunning = true;
+      if (widgetState.timerState.isRunning) return;
+      widgetState.timerState.isRunning = true;
       timerInterval = setInterval(() => {
-        if (state.timeRemaining > 0) {
-          state.timeRemaining--;
+        if (widgetState.timerState.timeRemaining > 0) {
+          widgetState.timerState.timeRemaining--;
           render();
         } else {
           clearInterval(timerInterval);
@@ -735,155 +644,166 @@
     };
 
     const pauseTimer = () => {
-      state.isRunning = false;
+      widgetState.timerState.isRunning = false;
       if (timerInterval) clearInterval(timerInterval);
       render();
     };
 
     const resetTimer = () => {
-      state.isRunning = false;
+      widgetState.timerState.isRunning = false;
       if (timerInterval) clearInterval(timerInterval);
-      state.mode = 'work';
-      state.timeRemaining = config.work.duration;
-      state.sessionCount = 0;
+      widgetState.timerState.mode = 'work';
+      widgetState.timerState.timeRemaining = widgetState.settings.workDuration * 60;
+      widgetState.timerState.sessionCount = 0;
       currentQuote = getRandomQuote();
       render();
     };
 
     const nextSession = () => {
-      if (state.mode === 'work') {
-        state.sessionCount++;
-        state.mode = state.sessionCount % state.totalSessions === 0 ? 'longBreak' : 'shortBreak';
+      if (widgetState.timerState.mode === 'work') {
+        widgetState.timerState.sessionCount++;
+        widgetState.timerState.mode = widgetState.timerState.sessionCount % widgetState.timerState.totalSessions === 0 ? 'longBreak' : 'shortBreak';
       } else {
-        state.mode = 'work';
+        widgetState.timerState.mode = 'work';
       }
-      state.timeRemaining = config[state.mode].duration;
+      widgetState.timerState.timeRemaining = config[widgetState.timerState.mode].duration;
       currentQuote = getRandomQuote();
       render();
     };
 
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
     // TASKS
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
 
     const saveTasks = () => {
-      localStorage.setItem('pomodoro-tasks', JSON.stringify(state.tasks));
+      localStorage.setItem('pomodoro-tasks', JSON.stringify(widgetState.tasks));
     };
 
     const addTask = () => {
       const text = taskInput.value.trim();
       if (!text) return;
-      state.tasks.push({ id: Date.now(), text, completed: false });
+      const task = {
+        id: Date.now().toString(),
+        text,
+        completed: false,
+      };
+      widgetState.tasks.push(task);
+      saveTasks();
       taskInput.value = '';
+      render();
+    };
+
+    const deleteTask = (id) => {
+      widgetState.tasks = widgetState.tasks.filter(t => t.id !== id);
       saveTasks();
       render();
     };
 
     const toggleTask = (id) => {
-      const task = state.tasks.find((t) => t.id === id);
-      if (task) task.completed = !task.completed;
-      saveTasks();
+      const task = widgetState.tasks.find(t => t.id === id);
+      if (task) {
+        task.completed = !task.completed;
+        saveTasks();
+        render();
+      }
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // LANGUAGE
+    // ─────────────────────────────────────────────────────────────
+
+    const setLanguage = (lang) => {
+      widgetState.language = lang;
+      localStorage.setItem('pomodoro-language', lang);
+      currentQuote = getRandomQuote();
       render();
     };
 
-    const deleteTask = (id) => {
-      state.tasks = state.tasks.filter((t) => t.id !== id);
-      saveTasks();
-      render();
-    };
-
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
     // RENDERING
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
 
     const render = () => {
-      const cfg = config[state.mode];
+      const { timerState, settings } = widgetState;
+      const modeConfig = config[timerState.mode];
 
-      // Timer
-      sessionMode.textContent = cfg.label;
-      timerDisplay.textContent = formatTime(state.timeRemaining);
-      timerDisplay.className = `timer-display ${cfg.className}`;
-      sessionInfo.textContent = `Session ${state.sessionCount + 1} of ${state.totalSessions}`;
+      // Update timer display
+      sessionMode.textContent = modeConfig.label;
+      timerDisplay.textContent = formatTime(timerState.timeRemaining);
+      timerDisplay.className = `timer-display ${modeConfig.className}`;
+      sessionInfo.textContent = `Session ${timerState.sessionCount + 1} of ${timerState.totalSessions}`;
 
-      // Controls
-      playBtn.style.display = state.isRunning ? 'none' : 'block';
-      pauseBtn.style.display = state.isRunning ? 'block' : 'none';
-
-      // Quote
-      quoteSection.textContent = `"${currentQuote}"`;
-      quoteSection.className = `quote-section ${cfg.className}`;
-
-      // Tasks
-      taskList.innerHTML = '';
-      if (state.tasks.length === 0) {
-        taskList.innerHTML = '<div class="empty-tasks">No tasks yet</div>';
-      } else {
-        state.tasks.forEach((task) => {
-          const taskEl = document.createElement('div');
-          taskEl.className = `task-item ${task.completed ? 'completed' : ''}`;
-          taskEl.innerHTML = `
-            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} />
-            <div class="task-text">${task.text}</div>
-            <button class="task-delete" title="Delete">
-              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-          `;
-          taskEl.querySelector('.task-checkbox').addEventListener('change', () => toggleTask(task.id));
-          taskEl.querySelector('.task-delete').addEventListener('click', () => deleteTask(task.id));
-          taskList.appendChild(taskEl);
-        });
+      // Update quote
+      if (timerState.mode === 'work') {
+        quoteSection.textContent = currentQuote;
+        quoteSection.className = `quote-section ${modeConfig.className}`;
       }
 
-      // Language
-      langEn.classList.toggle('active', state.language === 'en');
-      langAr.classList.toggle('active', state.language === 'ar');
+      // Update controls
+      if (timerState.isRunning) {
+        playBtn.style.display = 'none';
+        pauseBtn.style.display = 'block';
+      } else {
+        playBtn.style.display = 'block';
+        pauseBtn.style.display = 'none';
+      }
+
+      // Update task list
+      if (widgetState.tasks.length === 0) {
+        taskList.innerHTML = '<div class="empty-tasks">No tasks yet</div>';
+      } else {
+        taskList.innerHTML = widgetState.tasks.map(task => `
+          <div class="task-item ${task.completed ? 'completed' : ''}">
+            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask('${task.id}')" />
+            <div class="task-text">${task.text}</div>
+            <button class="task-delete" onclick="deleteTask('${task.id}')">×</button>
+          </div>
+        `).join('');
+      }
+
+      // Update language buttons
+      langEn.classList.toggle('active', widgetState.language === 'en');
+      langAr.classList.toggle('active', widgetState.language === 'ar');
     };
 
-    // ────────────────────────────────────────────────────────────────
-    // EVENTS
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // EVENT LISTENERS
+    // ─────────────────────────────────────────────────────────────
 
-    playBtn.addEventListener('click', () => {
-      startTimer();
-    });
-    
-    pauseBtn.addEventListener('click', () => {
-      pauseTimer();
-    });
-    
-    resetBtn.addEventListener('click', () => {
-      resetTimer();
+    closeBtn.addEventListener('click', () => {
+      window.electronAPI.closeWidget();
     });
 
-    tasksHeader.addEventListener('click', () => {
-      state.tasksExpanded = !state.tasksExpanded;
-      tasksToggle.classList.toggle('expanded', state.tasksExpanded);
-      tasksContainer.classList.toggle('expanded', state.tasksExpanded);
-    });
+    playBtn.addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', resetTimer);
 
     addTaskBtn.addEventListener('click', addTask);
     taskInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') addTask();
     });
 
-    langEn.addEventListener('click', () => {
-      state.language = 'en';
-      localStorage.setItem('pomodoro-language', 'en');
-      currentQuote = getRandomQuote();
-      render();
+    tasksHeader.addEventListener('click', () => {
+      tasksContainer.classList.toggle('expanded');
+      tasksToggle.classList.toggle('expanded');
     });
 
-    langAr.addEventListener('click', () => {
-      state.language = 'ar';
-      localStorage.setItem('pomodoro-language', 'ar');
-      currentQuote = getRandomQuote();
-      render();
-    });
+    langEn.addEventListener('click', () => setLanguage('en'));
+    langAr.addEventListener('click', () => setLanguage('ar'));
 
-    // ────────────────────────────────────────────────────────────────
-    // INIT
-    // ────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // IPC LISTENERS
+    // ─────────────────────────────────────────────────────────────
 
+    if (window.electronAPI) {
+      window.electronAPI.onWidgetStateUpdate((state) => {
+        widgetState = state;
+        currentQuote = widgetState.currentQuote || getRandomQuote();
+        render();
+      });
+    }
+
+    // Initial render
     render();
   </script>
 </body>

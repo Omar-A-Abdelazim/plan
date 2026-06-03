@@ -19,7 +19,6 @@ import {
   Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { WidgetSettingsButton } from '@/components/widget-settings'
 
 const PRIORITY_STYLES = {
   high: 'bg-destructive/20 text-destructive',
@@ -244,8 +243,6 @@ export function Pomodoro() {
           >
             <Settings className="w-6 h-6" />
           </button>
-
-          <WidgetSettingsButton />
         </div>
 
         {/* Stats */}

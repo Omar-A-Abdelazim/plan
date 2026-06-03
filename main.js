@@ -1,7 +1,6 @@
 const { app, BrowserWindow, Menu, Tray, ipcMain, Notification, globalShortcut } = require('electron');
 const isDev = require('electron-is-dev');
 const path = require('path');
-const { createWidgetWindow } = require('./widget');
 
 let mainWindow;
 let tray;
@@ -44,6 +43,44 @@ function createMainWindow() {
   });
 }
 
+function createWidgetWindow() {
+  if (widgetWindow && !widgetWindow.isDestroyed()) {
+    widgetWindow.show();
+    widgetWindow.focus();
+    return widgetWindow;
+  }
+
+  widgetWindow = new BrowserWindow({
+    width: 320,
+    height: 600,
+    minWidth: 280,
+    minHeight: 400,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false,
+      sandbox: true,
+    },
+    icon: path.join(__dirname, 'assets', 'icon.png'),
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+  });
+
+  const widgetUrl = isDevelopment
+    ? 'file://' + path.join(__dirname, 'widget.html')
+    : `file://${path.join(__dirname, '../widget.html')}`;
+
+  widgetWindow.loadFile(path.join(__dirname, 'widget.html'));
+
+  widgetWindow.on('closed', () => {
+    widgetWindow = null;
+  });
+
+  return widgetWindow;
+}
+
 function createTray() {
   tray = new Tray(path.join(__dirname, 'assets', 'icon.png'));
 
@@ -62,12 +99,7 @@ function createTray() {
     {
       label: 'Open Pomodoro Widget',
       click: () => {
-        if (!widgetWindow || widgetWindow.isDestroyed()) {
-          widgetWindow = createWidgetWindow();
-        } else {
-          widgetWindow.show();
-          widgetWindow.focus();
-        }
+        createWidgetWindow();
       },
     },
     {
@@ -96,7 +128,7 @@ app.on('ready', () => {
   // Register global shortcut: Ctrl+Shift+P to toggle Pomodoro widget
   globalShortcut.register('ctrl+shift+p', () => {
     if (!widgetWindow || widgetWindow.isDestroyed()) {
-      widgetWindow = createWidgetWindow();
+      createWidgetWindow();
     } else if (widgetWindow.isVisible()) {
       widgetWindow.hide();
     } else {
@@ -127,12 +159,7 @@ app.on('will-quit', () => {
 
 // IPC handlers
 ipcMain.handle('open-widget', () => {
-  if (!widgetWindow || widgetWindow.isDestroyed()) {
-    widgetWindow = createWidgetWindow();
-  } else {
-    widgetWindow.show();
-    widgetWindow.focus();
-  }
+  createWidgetWindow();
 });
 
 ipcMain.handle('show-notification', (event, { title, body }) => {
@@ -153,5 +180,18 @@ ipcMain.handle('show-main-window', () => {
   if (mainWindow) {
     mainWindow.show();
     mainWindow.focus();
+  }
+});
+
+// Widget state sync IPC handlers
+ipcMain.on('update-widget-state', (event, state) => {
+  if (widgetWindow && !widgetWindow.isDestroyed()) {
+    widgetWindow.webContents.send('widget-state-update', state);
+  }
+});
+
+ipcMain.on('widget-action', (event, action) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('widget-action', action);
   }
 });

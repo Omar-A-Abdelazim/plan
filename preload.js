@@ -16,4 +16,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showMainWindow: () => ipcRenderer.invoke('show-main-window'),
   notify: (title, body) => ipcRenderer.invoke('show-notification', { title, body }),
   openWidget: () => ipcRenderer.invoke('open-widget'),
+  
+  // Widget state sync
+  updateWidgetState: (state) => {
+    ipcRenderer.send('update-widget-state', state);
+  },
+  
+  onWidgetStateUpdate: (callback) => {
+    ipcRenderer.on('widget-state-update', (event, state) => callback(state));
+  },
+  
+  onWidgetAction: (callback) => {
+    ipcRenderer.on('widget-action', (event, action) => callback(action));
+  },
+  
+  sendWidgetAction: (action) => {
+    ipcRenderer.send('widget-action', action);
+  },
 });
