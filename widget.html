@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-  <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
@@ -36,6 +35,7 @@
       margin: 0;
       padding: 0;
       height: 100vh;
+      width: 100vw;
     }
 
     .card {
@@ -64,19 +64,21 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      gap: 16px;
+      padding: clamp(12px, 5%, 20px);
+      gap: clamp(8px, 3%, 16px);
       -webkit-app-region: drag;
+      min-height: 180px;
     }
 
     .compact-timer {
-      font-size: 64px;
+      font-size: clamp(36px, 12vw, 64px);
       font-weight: 700;
       letter-spacing: -2px;
       font-variant-numeric: tabular-nums;
       line-height: 1;
       text-align: center;
       transition: color 0.3s ease;
+      flex-shrink: 0;
     }
 
     .compact-timer.work { color: #c39af0; }
@@ -84,16 +86,17 @@
     .compact-timer.longBreak { color: #fbb96b; }
 
     .compact-quote {
-      font-size: 12px;
+      font-size: clamp(11px, 2vw, 14px);
       color: var(--muted-foreground);
       line-height: 1.5;
       text-align: center;
       font-style: italic;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      max-width: 280px;
+      max-width: 100%;
+      padding: 0 8px;
     }
 
     .compact-actions {
@@ -102,6 +105,7 @@
       align-items: center;
       justify-content: center;
       -webkit-app-region: no-drag;
+      flex-shrink: 0;
     }
 
     .icon-btn {
@@ -143,9 +147,11 @@
       width: 100%;
       height: 100%;
       flex-direction: column;
-      padding: 24px;
-      gap: 20px;
+      padding: clamp(16px, 4%, 24px);
+      gap: clamp(12px, 2%, 20px);
       overflow-y: auto;
+      overflow-x: hidden;
+      min-height: 180px;
     }
 
     .full-view.active {
@@ -155,24 +161,27 @@
     /* Header with Mode Tabs */
     .mode-tabs {
       display: flex;
-      gap: 8px;
+      gap: clamp(6px, 1.5%, 8px);
       flex-wrap: wrap;
+      align-items: center;
+      min-height: 32px;
     }
 
     .mode-tab {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 14px;
+      padding: clamp(6px, 1%, 8px) clamp(10px, 2%, 14px);
       border: none;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: clamp(12px, 2vw, 13px);
       font-weight: 500;
       background: transparent;
       color: var(--muted-foreground);
       cursor: pointer;
       transition: all 0.2s ease;
       -webkit-app-region: no-drag;
+      white-space: nowrap;
     }
 
     .mode-tab:hover {
@@ -209,6 +218,7 @@
       display: none;
       text-align: center;
       animation: fadeIn 0.3s ease;
+      min-height: 60px;
     }
 
     .quote-section.visible {
@@ -216,7 +226,7 @@
     }
 
     .quote-label {
-      font-size: 11px;
+      font-size: clamp(10px, 1.5vw, 11px);
       color: var(--muted-foreground);
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -231,10 +241,11 @@
       width: 14px;
       height: 14px;
       fill: #c39af0;
+      flex-shrink: 0;
     }
 
     .quote-text {
-      font-size: 15px;
+      font-size: clamp(13px, 2vw, 15px);
       font-style: italic;
       color: var(--foreground);
       line-height: 1.6;
@@ -242,19 +253,20 @@
     }
 
     .quote-author {
-      font-size: 11px;
+      font-size: clamp(10px, 1.5vw, 11px);
       color: var(--muted-foreground);
     }
 
     /* Timer Display with SVG Ring */
     .timer-display {
       position: relative;
-      width: 160px;
-      height: 160px;
+      width: clamp(120px, 30vw, 160px);
+      height: clamp(120px, 30vw, 160px);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 16px 0;
+      margin: clamp(8px, 2%, 16px) 0;
+      flex-shrink: 0;
     }
 
     .timer-ring {
@@ -299,7 +311,7 @@
     }
 
     .timer-time {
-      font-size: 42px;
+      font-size: clamp(28px, 8vw, 42px);
       font-weight: 700;
       letter-spacing: -1.5px;
       font-variant-numeric: tabular-nums;
@@ -312,24 +324,26 @@
     .timer-time.accent { color: #fbb96b; }
 
     .timer-session {
-      font-size: 11px;
+      font-size: clamp(10px, 1.5vw, 11px);
       color: var(--muted-foreground);
     }
 
     /* Controls */
     .controls {
       display: flex;
-      gap: 12px;
+      gap: clamp(8px, 2%, 12px);
       align-items: center;
       justify-content: center;
+      flex-wrap: wrap;
+      min-height: 56px;
     }
 
     .control-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 44px;
-      height: 44px;
+      width: clamp(36px, 8vw, 44px);
+      height: clamp(36px, 8vw, 44px);
       border: none;
       border-radius: 50%;
       background: rgba(255,255,255,0.06);
@@ -337,6 +351,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
       -webkit-app-region: no-drag;
+      flex-shrink: 0;
     }
 
     .control-btn:hover {
@@ -345,8 +360,8 @@
     }
 
     .control-btn.play-btn {
-      width: 56px;
-      height: 56px;
+      width: clamp(44px, 10vw, 56px);
+      height: clamp(44px, 10vw, 56px);
       background: linear-gradient(135deg, #8b5cf6, #3b82f6);
       color: white;
     }
@@ -357,8 +372,8 @@
     }
 
     .control-btn svg {
-      width: 20px;
-      height: 20px;
+      width: clamp(16px, 4vw, 20px);
+      height: clamp(16px, 4vw, 20px);
       stroke: currentColor;
       stroke-width: 2;
       stroke-linecap: round;
@@ -367,61 +382,69 @@
     }
 
     .control-btn.play-btn svg {
-      width: 24px;
-      height: 24px;
+      width: clamp(18px, 5vw, 24px);
+      height: clamp(18px, 5vw, 24px);
     }
 
     /* Stats */
     .stats {
       display: flex;
       justify-content: center;
-      gap: 40px;
-      padding: 16px 0;
+      gap: clamp(20px, 5%, 40px);
+      padding: clamp(12px, 2%, 16px) 0;
       border-top: 1px solid rgba(255,255,255,0.08);
       border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-wrap: wrap;
+      min-height: 70px;
     }
 
     .stat-item {
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
     }
 
     .stat-value {
-      font-size: 28px;
+      font-size: clamp(20px, 6vw, 28px);
       font-weight: 700;
       color: var(--foreground);
     }
 
     .stat-label {
-      font-size: 11px;
+      font-size: clamp(10px, 1.5vw, 11px);
       color: var(--muted-foreground);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-top: 4px;
     }
 
     /* Footer */
     .footer {
       display: flex;
-      gap: 12px;
+      gap: clamp(8px, 2%, 12px);
       align-items: center;
       justify-content: center;
-      padding: 12px 0;
+      padding: clamp(8px, 1.5%, 12px) 0;
+      flex-wrap: wrap;
+      flex-shrink: 0;
     }
 
     .notification-btn {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 12px;
+      padding: clamp(4px, 1%, 6px) clamp(8px, 1.5%, 12px);
       border: none;
       border-radius: 6px;
       background: transparent;
       color: var(--muted-foreground);
       cursor: pointer;
-      font-size: 12px;
+      font-size: clamp(11px, 1.5vw, 12px);
       font-weight: 500;
       transition: all 0.2s ease;
       -webkit-app-region: no-drag;
+      white-space: nowrap;
     }
 
     .notification-btn:hover {
@@ -430,18 +453,19 @@
     }
 
     .notification-btn svg {
-      width: 16px;
-      height: 16px;
+      width: clamp(14px, 3vw, 16px);
+      height: clamp(14px, 3vw, 16px);
       stroke: currentColor;
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
       fill: none;
+      flex-shrink: 0;
     }
 
     .lang-divider {
       width: 1px;
-      height: 16px;
+      height: clamp(12px, 3vw, 16px);
       background: rgba(255,255,255,0.15);
     }
 
@@ -453,15 +477,16 @@
     }
 
     .lang-toggle button {
-      padding: 6px 12px;
+      padding: clamp(4px, 1%, 6px) clamp(8px, 1%, 12px);
       border: none;
       background: transparent;
       color: var(--muted-foreground);
       cursor: pointer;
-      font-size: 11px;
+      font-size: clamp(10px, 1.5vw, 11px);
       font-weight: 600;
       transition: all 0.2s ease;
       -webkit-app-region: no-drag;
+      white-space: nowrap;
     }
 
     .lang-toggle button.active {

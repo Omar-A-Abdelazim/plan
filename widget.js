@@ -15,7 +15,9 @@ function createWidgetWindow() {
     y: height - COMPACT.height - 20,
     frame: false,
     alwaysOnTop: true,
-    resizable: false,
+    resizable: true,
+    minWidth: 300,
+    minHeight: 180,
     transparent: true,
     backgroundColor: '#00000000',
     show: false,
@@ -38,11 +40,8 @@ function createWidgetWindow() {
 
   // IPC: toggle compact <-> full
   ipcMain.on('widget-set-mode', (event, mode) => {
-    if (mode === 'full') {
-      widgetWindow.setSize(FULL.width, FULL.height);
-    } else {
-      widgetWindow.setSize(COMPACT.width, COMPACT.height);
-    }
+    // Don't force resize on mode switch; let user maintain their chosen size
+    // This allows flexible resizing independent of mode changes
   });
 
   // IPC: close / minimize
