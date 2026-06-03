@@ -620,7 +620,7 @@
   <script>
     // ────────────────────────────────────────────────────────────────
     // QUOTES
-    // ───────────────────────────────────────────�����────────────────────
+    // ─────────���─────────────────────────────────�����────────────────────
 
     const QUOTES = {
       en: [
@@ -686,20 +686,10 @@
     const langAr = document.getElementById('langAr');
 
     // ────────────────────────────────────────────────────────────────
-    // IPC LISTENERS (Sync with main app)
+    // IPC LISTENERS
     // ────────────────────────────────────────────────────────────────
+    // Note: Widget runs independently - no state sync with main app
 
-    if (window.electronAPI?.onIPC) {
-      window.electronAPI.onIPC('pomodoro-state-changed', (newState) => {
-        // Update widget state from main app
-        if (newState.mode !== undefined) state.mode = newState.mode;
-        if (newState.timeRemaining !== undefined) state.timeRemaining = newState.timeRemaining;
-        if (newState.isRunning !== undefined) state.isRunning = newState.isRunning;
-        if (newState.sessionCount !== undefined) state.sessionCount = newState.sessionCount;
-        if (newState.totalSessions !== undefined) state.totalSessions = newState.totalSessions;
-        render();
-      });
-    }
     const quoteSection = document.getElementById('quoteSection');
     const tasksHeader = document.getElementById('tasksHeader');
     const tasksToggle = document.getElementById('tasksToggle');
@@ -736,17 +726,9 @@
         if (state.timeRemaining > 0) {
           state.timeRemaining--;
           render();
-          // Broadcast state every second
-          if (window.electronAPI?.ipcSend) {
-            window.electronAPI.ipcSend('pomodoro-state-update', state);
-          }
         } else {
           clearInterval(timerInterval);
           nextSession();
-          // Broadcast state on session change
-          if (window.electronAPI?.ipcSend) {
-            window.electronAPI.ipcSend('pomodoro-state-update', state);
-          }
         }
       }, 1000);
       render();
@@ -863,26 +845,14 @@
 
     playBtn.addEventListener('click', () => {
       startTimer();
-      // Broadcast state to main app
-      if (window.electronAPI?.ipcSend) {
-        window.electronAPI.ipcSend('pomodoro-state-update', state);
-      }
     });
     
     pauseBtn.addEventListener('click', () => {
       pauseTimer();
-      // Broadcast state to main app
-      if (window.electronAPI?.ipcSend) {
-        window.electronAPI.ipcSend('pomodoro-state-update', state);
-      }
     });
     
     resetBtn.addEventListener('click', () => {
       resetTimer();
-      // Broadcast state to main app
-      if (window.electronAPI?.ipcSend) {
-        window.electronAPI.ipcSend('pomodoro-state-update', state);
-      }
     });
 
     tasksHeader.addEventListener('click', () => {

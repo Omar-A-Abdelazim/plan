@@ -155,10 +155,3 @@ ipcMain.handle('show-main-window', () => {
     mainWindow.focus();
   }
 });
-
-// IPC: Receive state updates from widget and relay to main window
-ipcMain.on('pomodoro-state-update', (event, state) => {
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('widget-state-update', state);
-  }
-});
