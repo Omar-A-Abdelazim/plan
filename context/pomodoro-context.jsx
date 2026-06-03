@@ -52,6 +52,22 @@ export function PomodoroProvider({ children }) {
     broadcastToWidget(timerState)
   }, [timerState])
 
+  // Listen for widget state updates from IPC
+  useEffect(() => {
+    if (window.electronAPI?.onIPC) {
+      window.electronAPI.onIPC('widget-state-update', (widgetState) => {
+        setTimerState(prev => ({
+          ...prev,
+          mode: widgetState.mode ?? prev.mode,
+          timeRemaining: widgetState.timeRemaining ?? prev.timeRemaining,
+          isRunning: widgetState.isRunning ?? prev.isRunning,
+          sessionCount: widgetState.sessionCount ?? prev.sessionCount,
+          totalSessions: widgetState.totalSessions ?? prev.totalSessions,
+        }))
+      })
+    }
+  }, [])
+
   // Timer logic
   useEffect(() => {
     if (timerState.isRunning) {
