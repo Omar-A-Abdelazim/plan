@@ -782,8 +782,23 @@
 
     if (window.electronAPI) {
       window.electronAPI.onWidgetStateUpdate((state) => {
-        widgetState = state;
-        currentQuote = widgetState.currentQuote || getRandomQuote();
+        // Only update specific fields to avoid rendering artifacts
+        if (state.timerState) {
+          widgetState.timerState = state.timerState;
+        }
+        if (state.settings) {
+          widgetState.settings = state.settings;
+        }
+        if (state.currentQuote !== undefined) {
+          currentQuote = state.currentQuote || getRandomQuote();
+        }
+        // Use strict equality check for tasks to prevent duplicates
+        if (state.tasks && JSON.stringify(state.tasks) !== JSON.stringify(widgetState.tasks)) {
+          widgetState.tasks = state.tasks;
+        }
+        if (state.language) {
+          widgetState.language = state.language;
+        }
         render();
       });
     }
