@@ -82,12 +82,14 @@ export function PomodoroProvider({ children }) {
             }))
             break
           case 'task:add':
+            console.log("[v0] Adding task:", action.payload);
             setTasks(prev => {
               const newTasks = [...prev, { 
                 id: Date.now().toString(), 
                 text: action.payload.text, 
                 completed: false 
               }]
+              console.log("[v0] Tasks after add:", newTasks);
               return newTasks
             })
             break
@@ -137,6 +139,7 @@ export function PomodoroProvider({ children }) {
             }
             
             // Auto-transition to next session
+            console.log("[v0] Timer completed, auto-transitioning", { mode: prev.mode, sessionCount: prev.sessionCount });
             const newSessionCount = prev.mode === 'work' ? prev.sessionCount + 1 : prev.sessionCount
             const isLongBreak = newSessionCount >= settings.sessionsBeforeLongBreak
             
