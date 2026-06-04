@@ -25,6 +25,7 @@ export function PomodoroProvider({ children }) {
   const [currentQuote, setCurrentQuote] = useState(null)
   const [tasks, setTasks] = useState([])
   const [language, setLanguage] = useState('en')
+  const [showWidget, setShowWidget] = useState(false)
   
   const intervalRef = useRef(null)
   const onCompleteRef = useRef(null)
@@ -332,6 +333,20 @@ export function PomodoroProvider({ children }) {
     return false
   }, [])
 
+  const toggleWidget = useCallback(() => {
+    setShowWidget(prev => {
+      const newState = !prev
+      if (typeof window !== 'undefined' && window.electronAPI) {
+        if (newState) {
+          window.electronAPI.openWidget()
+        } else {
+          window.electronAPI.closeWidget()
+        }
+      }
+      return newState
+    })
+  }, [])
+
   return (
     <PomodoroContext.Provider value={{
       settings,
@@ -340,6 +355,8 @@ export function PomodoroProvider({ children }) {
       tasks,
       language,
       setLanguage,
+      showWidget,
+      toggleWidget,
       startTimer,
       pauseTimer,
       resetTimer,
